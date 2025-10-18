@@ -17,23 +17,25 @@ const Navbar = ({ toggleTheme, theme }) => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 shadow-sm
+      className={`fixed top-0 left-0 w-full z-50
         backdrop-blur-xl bg-white/30 dark:bg-[#0e0b1b]/40
+        border-b border-white/20 dark:border-gray-700/40
         text-black dark:text-white
-        transition-all duration-500 border-b border-white/20 dark:border-gray-700/40`}
+        transition-all duration-500`}
       style={{ height: "80px" }}
     >
-      <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between relative">
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <img
             src={logo}
             alt="Reyimberdiyev Logo"
-            className="w-40 h-auto object-contain"
+            className="w-40 h-auto object-contain cursor-pointer"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           />
         </div>
 
-        {/* Menu (Desktop) */}
+        {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-10 text-lg font-medium">
           {["home", "projects", "experience", "contact"].map((item) => (
             <li key={item}>
@@ -52,7 +54,7 @@ const Navbar = ({ toggleTheme, theme }) => {
           ))}
         </ul>
 
-        {/* Language + Theme (always visible) */}
+        {/* Language + Theme */}
         <div className="flex items-center space-x-3">
           {/* Language */}
           <div className="flex items-center space-x-2">
@@ -74,7 +76,7 @@ const Navbar = ({ toggleTheme, theme }) => {
             ))}
           </div>
 
-          {/* Theme toggle */}
+          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             className="ml-3 text-xl p-2 rounded-full 
@@ -86,7 +88,7 @@ const Navbar = ({ toggleTheme, theme }) => {
             {theme === "dark" ? <FaSun /> : <FaMoon />}
           </button>
 
-          {/* Hamburger */}
+          {/* Hamburger (Mobile) */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden text-xl p-2 rounded-lg
@@ -119,32 +121,32 @@ const Navbar = ({ toggleTheme, theme }) => {
             </svg>
           </button>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div
-          className="md:hidden absolute top-[80px] left-0 w-full 
-          bg-white/80 dark:bg-[#0e0b1b]/90 
-          backdrop-blur-xl border-t border-white/20 dark:border-gray-700/40 
-          text-center py-4 space-y-4"
-        >
-          {["home", "projects", "experience", "contact"].map((item) => (
-            <Link
-              key={item}
-              to={item}
-              smooth={true}
-              duration={500}
-              offset={-80}
-              spy={true}
-              onClick={() => setMenuOpen(false)}
-              className="block text-lg font-medium cursor-pointer hover:text-purple-400 transition"
-            >
-              {t(`navbar.${item}`)}
-            </Link>
-          ))}
-        </div>
-      )}
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div
+            className="md:hidden absolute top-[80px] left-0 w-full 
+              bg-white/30 dark:bg-[#0e0b1b]/40
+              backdrop-blur-xl border-t border-white/20 dark:border-gray-700/40 
+              text-center py-4 space-y-4"
+          >
+            {["home", "projects", "experience", "contact"].map((item) => (
+              <Link
+                key={item}
+                to={item}
+                smooth={true}
+                duration={500}
+                offset={-80}
+                spy={true}
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-medium cursor-pointer hover:text-purple-400 transition"
+              >
+                {t(`navbar.${item}`)}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </nav>
   );
 };
