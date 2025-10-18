@@ -1,0 +1,73 @@
+{
+  "navbar": {
+    "home": "Bosh sahifa",
+    "projects": "Loyihalar",
+    "experience": "Tajriba",
+    "contact": "Aloqa"
+  },
+  "hero": {
+    "title1": "Men dasturlayman va",
+    "title2": "bu haqda kontent yarataman!",
+    "description": "Men Temurbek Reyimberdiyevman — 4 yildan ortiq tajribaga ega Full-Stack dasturchi va IT mentorman. Men yangi dasturchilarga yordam berish va zamonaviy, samarali web yechimlar yaratishga qiziqaman.",
+    "btn_contact": "Aloqaga chiqish",
+    "btn_cv": "CV yuklab olish"
+  },
+  "skills": {
+    "title": "Ko‘nikmalar",
+    "description": "Men yaxshi biladigan texnologiyalar, vositalar va tillar:"
+  },
+  "projects": {
+    "title": "LOYIHALAR",
+    "live": "Saytni ko‘rish",
+    "items": {
+      "earth": {
+        "title": "3D Quyosh tizimi sayyoralarini o‘rganing",
+        "description": "Three.js yordamida Quyosh tizimidagi sayyoralarni 3D tarzda o‘rganing."
+      },
+      "yoom": {
+        "title": "Yoom - Video qo‘ng‘iroq platformasi",
+        "description": "Yoom bilan uchrashuvlarni osonlashtiring. Hamkasblar va do‘stlar bilan bir zumda ulaning."
+      },
+      "aiSaas": {
+        "title": "AI Image SaaS - Canva ilovasi",
+        "description": "AI funksiyalari, to‘lov tizimi va kredit hisoblash imkoniyatiga ega haqiqiy SaaS ilovasi."
+      },
+      "iphone": {
+        "title": "3D iPhone animatsion veb-sayti",
+        "description": "GSAP va Three.js yordamida Apple iPhone 15 Pro saytining 3D versiyasi."
+      }
+    }
+  },
+  "experience": {
+    "title": "TAJRIBA",
+    "at": "da",
+    "period": {
+      "google": "Noyabr 2019 – Hozirgacha",
+      "apple": "Yanvar 2016 – Dekabr 2017",
+      "meta": "Yanvar 2017 – Oktabr 2019"
+    },
+    "items": {
+      "google": {
+        "role": "Yetakchi Dasturchi",
+        "description": "Google'da ishlagan davrimda, asosiy qidiruv algoritmlarini takomillashtirish ustida ishladim. Jamoa bilan hamkorlikda milliardlab foydalanuvchilar uchun aniqlik va samaradorlikni oshirishga hissa qo‘shdim."
+      },
+      "apple": {
+        "role": "Kichik Dasturchi",
+        "description": "Apple kompaniyasida dasturiy ta'minot arxitekturasini ishlab chiqishda qatnashdim. Kengaytiriladigan tizimlar yaratish va jamoani boshqarish bo‘yicha mas’ul edim."
+      },
+      "meta": {
+        "role": "Dasturchi",
+        "description": "Meta'da backend tizimlar arxitekturasi va katta hajmdagi ma’lumotlarni qayta ishlash bilan shug‘ullandim."
+      }
+    }
+  },
+  "contact": {
+    "title": "Aloqa",
+    "location": "Urganch, Xorazm, O‘zbekiston",
+    "telegram": "Telegram",
+    "instagram": "Instagram",
+    "github": "Github",
+    "linkedin": "Linkedin",
+    "footer": "Mualliflik huquqi ©2025 Temurbek Reyimberdiyev"
+  }
+}

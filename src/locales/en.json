@@ -1,0 +1,73 @@
+{
+  "navbar": {
+    "home": "Home",
+    "projects": "Projects",
+    "experience": "Experience",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title1": "I do code and",
+    "title2": "make content about it!",
+    "description": "I am Temurbek Reyimberdiyev, a seasoned Full-Stack Software Engineer and IT Mentor with over 4 years of professional experience. I love mentoring aspiring developers and building modern, efficient, and cloud-driven software solutions.",
+    "btn_contact": "Get In Touch",
+    "btn_cv": "Download CV"
+  },
+  "skills": {
+    "title": "Skills",
+    "description": "The skills, tools and technologies I am really good at:"
+  },
+  "projects": {
+    "title": "PROJECTS",
+    "live": "Check Live Site",
+    "items": {
+      "earth": {
+        "title": "3D Solar System Planets to Explore",
+        "description": "Explore the wonders of our solar system with this captivating 3D simulation using Three.js."
+      },
+      "yoom": {
+        "title": "Yoom - Video Conferencing App",
+        "description": "Simplify your meetings with Yoom. Connect seamlessly with colleagues and friends."
+      },
+      "aiSaas": {
+        "title": "AI Image SaaS - Canva Application",
+        "description": "A real Software-as-a-Service app with AI features, payments and credit system using the latest stack."
+      },
+      "iphone": {
+        "title": "Animated Apple iPhone 3D Website",
+        "description": "Recreated the Apple iPhone 15 Pro website with GSAP animations and Three.js 3D effects."
+      }
+    }
+  },
+  "experience": {
+    "title": "EXPERIENCE",
+     "at": "at",
+    "period": {
+      "google": "Nov 2019 – Present",
+      "apple": "Jan 2016 – Dec 2017",
+      "meta": "Jan 2017 – Oct 2019"
+    },
+    "items": {
+      "google": {
+        "role": "Lead Software Engineer",
+        "description": "At Google, I helped improve the accuracy and efficiency of core search algorithms used by millions of people."
+      },
+      "apple": {
+        "role": "Junior Software Engineer",
+        "description": "At Apple, I contributed to designing scalable software systems and led a cross-functional engineering team."
+      },
+      "meta": {
+        "role": "Software Engineer",
+        "description": "At Meta, I worked on backend architecture and large-scale data processing systems."
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "location": "Urgench, Khorezm, Uzbekistan",
+    "telegram": "Telegram",
+    "instagram": "Instagram",
+    "github": "Github",
+    "linkedin": "Linkedin",
+    "footer": "Copyright ©2025 Temurbek Reyimberdiyev"
+  }
+}
