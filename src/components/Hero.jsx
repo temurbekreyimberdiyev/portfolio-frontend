@@ -17,23 +17,31 @@ const Hero = () => {
       {/* Avatar */}
       <div
         className="
-          mb-8 p-[6px]
-          rounded-full
-          bg-black/20 dark:bg-black/50
-          backdrop-blur-xl
-          shadow-2xl
-          border-4 border-purple-600
+          mb-8 p-[6px] rounded-full shadow-2xl
+          bg-gradient-to-tr from-purple-400 via-pink-400 to-orange-300
+          dark:from-purple-600 dark:via-pink-500 dark:to-orange-500
+          transition-colors duration-500
+          animate-spin-slow
         "
       >
-        <img
-          src={profil}
-          alt="Temurbek"
+        <div
           className="
-            w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 
-            rounded-full
-            shadow-lg
+            rounded-full p-1
+            bg-white/30 dark:bg-black/40
+            backdrop-blur-xl
+            border border-white/30 dark:border-gray-700/50
+            shadow-inner
           "
-        />
+        >
+          <img
+            src={profil}
+            alt="Temurbek"
+            className="
+              w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 
+              rounded-full shadow-lg
+            "
+          />
+        </div>
       </div>
 
       {/* Title */}
@@ -55,12 +63,12 @@ const Hero = () => {
         <button
           className="
             px-6 py-3 rounded-full font-semibold
-            bg-black/30 dark:bg-white/20
+            bg-gradient-to-r from-purple-500/40 to-pink-500/40
             backdrop-blur-lg
-            text-white dark:text-white
+            text-white
             border border-white/30
             shadow-lg
-            hover:bg-black/50 dark:hover:bg-white/30
+            hover:from-purple-600/60 hover:to-pink-600/60
             transition
           "
         >
@@ -73,7 +81,7 @@ const Hero = () => {
             px-6 py-3 rounded-full font-semibold
             bg-white/40 dark:bg-black/30
             backdrop-blur-lg
-            border border-black/30 dark:border-white/30
+            border border-white/30 dark:border-gray-700/40
             shadow-md
             hover:bg-purple-600 hover:text-white
             transition

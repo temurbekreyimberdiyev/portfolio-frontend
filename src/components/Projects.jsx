@@ -51,7 +51,8 @@ export default function Projects() {
         {t("projects.title")}
       </h2>
 
-      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-2">
+      {/* Responsive grid — 1 ustun (mobil), 2 ustun (tablet va desktop) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
         {projects.map((project, index) => (
           <ProjectCard key={index} {...project} />
         ))}

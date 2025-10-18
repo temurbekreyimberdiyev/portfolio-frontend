@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import logoDark from "../assets/logo_dark.png";
 import logoLight from "../assets/logo_light.png";
 import { useTranslation } from "react-i18next";
@@ -7,6 +7,7 @@ import { Link } from "react-scroll";
 
 const Navbar = ({ toggleTheme, theme }) => {
   const { t, i18n } = useTranslation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -32,7 +33,7 @@ const Navbar = ({ toggleTheme, theme }) => {
           />
         </div>
 
-        {/* Menu */}
+        {/* Menu (Desktop) */}
         <ul className="hidden md:flex space-x-10 text-lg font-medium">
           {["home", "projects", "experience", "contact"].map((item) => (
             <li key={item}>
@@ -51,7 +52,7 @@ const Navbar = ({ toggleTheme, theme }) => {
           ))}
         </ul>
 
-        {/* Language + Theme Switcher */}
+        {/* Language + Theme (always visible) */}
         <div className="flex items-center space-x-3">
           {/* Language */}
           <div className="flex items-center space-x-2">
@@ -73,7 +74,7 @@ const Navbar = ({ toggleTheme, theme }) => {
             ))}
           </div>
 
-          {/* Theme Toggle */}
+          {/* Theme toggle */}
           <button
             onClick={toggleTheme}
             className="ml-3 text-xl p-2 rounded-full 
@@ -84,31 +85,66 @@ const Navbar = ({ toggleTheme, theme }) => {
           >
             {theme === "dark" ? <FaSun /> : <FaMoon />}
           </button>
-        </div>
 
-        {/* Mobile menu (hamburger icon) */}
-        <button
-          className="md:hidden text-xl p-2 rounded-lg
-            bg-white/20 dark:bg-white/10 
-            border border-white/30 dark:border-gray-700/40 
-            backdrop-blur-md shadow-sm hover:text-purple-400 transition"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-7 w-7"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+          {/* Hamburger */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden text-xl p-2 rounded-lg
+              bg-white/20 dark:bg-white/10 
+              border border-white/30 dark:border-gray-700/40 
+              backdrop-blur-md shadow-sm hover:text-purple-400 transition"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-7 w-7"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {menuOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div
+          className="md:hidden absolute top-[80px] left-0 w-full 
+          bg-white/80 dark:bg-[#0e0b1b]/90 
+          backdrop-blur-xl border-t border-white/20 dark:border-gray-700/40 
+          text-center py-4 space-y-4"
+        >
+          {["home", "projects", "experience", "contact"].map((item) => (
+            <Link
+              key={item}
+              to={item}
+              smooth={true}
+              duration={500}
+              offset={-80}
+              spy={true}
+              onClick={() => setMenuOpen(false)}
+              className="block text-lg font-medium cursor-pointer hover:text-purple-400 transition"
+            >
+              {t(`navbar.${item}`)}
+            </Link>
+          ))}
+        </div>
+      )}
     </nav>
   );
 };

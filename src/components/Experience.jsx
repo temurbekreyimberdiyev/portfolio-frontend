@@ -8,19 +8,19 @@ export default function Experience() {
     {
       company: "Google",
       role: t("experience.items.google.role"),
-      period: "experience.period.google",
+      period: t("experience.period.google"),
       description: t("experience.items.google.description"),
     },
     {
       company: "Apple",
       role: t("experience.items.apple.role"),
-      period: "experience.period.apple",
+      period: t("experience.period.apple"),
       description: t("experience.items.apple.description"),
     },
     {
       company: "Meta",
       role: t("experience.items.meta.role"),
-      period: "experience.period.meta",
+      period: t("experience.period.meta"),
       description: t("experience.items.meta.description"),
     },
   ];
@@ -39,7 +39,6 @@ export default function Experience() {
         overflow-hidden
       "
     >
-      {/* Liquid reflection layer */}
       <div
         className="
           absolute inset-0 
@@ -48,18 +47,6 @@ export default function Experience() {
           opacity-60 pointer-events-none
         "
       />
-
-      {/* Subtle top reflection */}
-      <div
-        className="
-          absolute top-0 left-0 w-full h-[80px]
-          bg-gradient-to-b from-white/50 to-transparent
-          dark:from-white/10 dark:to-transparent
-          opacity-50 pointer-events-none
-        "
-      />
-
-      {/* Title */}
       <h2
         className="
           relative text-center text-3xl font-bold mb-12 tracking-widest
@@ -69,7 +56,6 @@ export default function Experience() {
         {t("experience.title")}
       </h2>
 
-      {/* Experience items */}
       <div className="relative max-w-4xl mx-auto z-10">
         {experiences.map((exp, index) => (
           <ExperienceItem key={index} {...exp} />
