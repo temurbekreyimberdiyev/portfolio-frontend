@@ -25,7 +25,15 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black dark:bg-[#000319] dark:text-white transition-all duration-500">
+    <div
+      className="
+        min-h-screen 
+        transition-all duration-500
+        bg-gradient-to-b from-white via-sky-100 to-blue-200
+        dark:bg-gradient-to-b dark:from-[#000319] dark:via-[#0b1120] dark:to-[#1e293b]
+        text-black dark:text-white
+      "
+    >
       {/* Global container */}
       <div className="max-w-6xl mx-auto px-6 md:px-10">
         <Navbar toggleTheme={toggleTheme} theme={theme} />

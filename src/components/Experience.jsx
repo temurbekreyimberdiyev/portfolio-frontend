@@ -27,11 +27,14 @@ export default function Experience() {
 
   return (
     <section
-      className="py-20 px-6 md:px-16 
-      text-gray-800 dark:text-white 
-      bg-white dark:bg-[#000319] 
-      transition-colors duration-500"
-    >
+  className="
+    py-20 px-6 md:px-16 
+    text-gray-800 dark:text-white 
+    bg-white dark:bg-[#000319] 
+    rounded-3xl shadow-lg
+    transition-colors duration-500
+  "
+>
       <h2 className="text-center text-3xl font-bold mb-12 tracking-widest 
         text-blue-500 dark:text-blue-400">
         {t("experience.title")}

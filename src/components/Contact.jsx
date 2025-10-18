@@ -18,7 +18,8 @@ const Contact = () => {
       className="
         w-full 
         flex flex-col items-center 
-        px-6 py-10 
+        px-6 py-10
+        mt-10 sm:mt-20
         text-gray-800 dark:text-white 
         bg-gray-100 dark:bg-[#000009] 
         transition-colors duration-500

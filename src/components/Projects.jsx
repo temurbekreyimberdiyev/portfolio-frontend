@@ -39,8 +39,8 @@ export default function Projects() {
   return (
     <section
       className="py-20 px-6 md:px-16 
-      bg-white text-black 
-      dark:bg-[#000319] dark:text-white 
+      text-black 
+      dark:text-white 
       transition-colors duration-500"
     >
       <h2

@@ -6,7 +6,7 @@ const Hero = () => {
 
   return (
     <section className="min-h-screen flex flex-col items-center justify-center px-4 text-center pt-20 
-      bg-white text-black dark:bg-[#000319] dark:text-white transition-colors duration-500">
+      text-black dark:text-white transition-colors duration-500">
       
       {/* Avatar */}
       <div className="mb-8">

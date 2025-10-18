@@ -32,8 +32,15 @@ export default function Skills() {
   ];
 
   return (
-    <section className="py-16 flex flex-col items-center 
-      bg-white text-black dark:bg-[#000319] dark:text-white transition-colors duration-500">
+    <section
+  className="
+    py-16 flex flex-col items-center 
+    rounded-3xl shadow-lg
+    bg-white text-black 
+    dark:bg-[#000319] dark:text-white
+    transition-colors duration-500
+  "
+>
 
       {/* Title button */}
       <button className="bg-gradient-to-r from-[#4ba3c7] to-[#1b3c4d] text-gray-200 
