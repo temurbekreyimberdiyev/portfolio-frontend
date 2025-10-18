@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { Link } from "react-scroll";
 
-
 const Navbar = ({ toggleTheme, theme }) => {
   const { t, i18n } = useTranslation();
 
@@ -17,12 +16,12 @@ const Navbar = ({ toggleTheme, theme }) => {
 
   return (
     <nav
-  className={`fixed top-0 left-0 w-full z-50 shadow-sm
-    backdrop-blur-lg bg-white/70 dark:bg-[#0e0b1b]/60
-    text-black dark:text-white
-    transition-all duration-500 border-b border-white/20 dark:border-gray-700/40`}
-  style={{ height: "80px" }}
->
+      className={`fixed top-0 left-0 w-full z-50 shadow-sm
+        backdrop-blur-xl bg-white/30 dark:bg-[#0e0b1b]/40
+        text-black dark:text-white
+        transition-all duration-500 border-b border-white/20 dark:border-gray-700/40`}
+      style={{ height: "80px" }}
+    >
       <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-2">
@@ -35,93 +34,52 @@ const Navbar = ({ toggleTheme, theme }) => {
 
         {/* Menu */}
         <ul className="hidden md:flex space-x-10 text-lg font-medium">
-  <li>
-    <Link
-      to="home"
-      smooth={true}
-      duration={500}
-      offset={-80}
-      spy={true}
-      activeClass="text-purple-400 font-semibold"
-      className="cursor-pointer hover:text-purple-400 transition"
-    >
-      {t("navbar.home")}
-    </Link>
-  </li>
-
-  <li>
-    <Link
-      to="projects"
-      smooth={true}
-      duration={500}
-      offset={-80}
-      spy={true}
-      activeClass="text-purple-400 font-semibold"
-      className="cursor-pointer hover:text-purple-400 transition"
-    >
-      {t("navbar.projects")}
-    </Link>
-  </li>
-
-  <li>
-    <Link
-      to="experience"
-      smooth={true}
-      duration={500}
-      offset={-80}
-      spy={true}
-      activeClass="text-purple-400 font-semibold"
-      className="cursor-pointer hover:text-purple-400 transition"
-    >
-      {t("navbar.experience")}
-    </Link>
-  </li>
-
-  <li>
-    <Link
-      to="contact"
-      smooth={true}
-      duration={500}
-      offset={-80}
-      spy={true}
-      activeClass="text-purple-400 font-semibold"
-      className="cursor-pointer hover:text-purple-400 transition"
-    >
-      {t("navbar.contact")}
-    </Link>
-  </li>
-</ul>
+          {["home", "projects", "experience", "contact"].map((item) => (
+            <li key={item}>
+              <Link
+                to={item}
+                smooth={true}
+                duration={500}
+                offset={-80}
+                spy={true}
+                activeClass="text-purple-400 font-semibold"
+                className="cursor-pointer hover:text-purple-400 transition"
+              >
+                {t(`navbar.${item}`)}
+              </Link>
+            </li>
+          ))}
+        </ul>
 
         {/* Language + Theme Switcher */}
         <div className="flex items-center space-x-3">
           {/* Language */}
           <div className="flex items-center space-x-2">
-            <button
-              onClick={() => changeLanguage("uz")}
-              className="text-sm hover:text-purple-400 transition"
-            >
-              UZ
-            </button>
-            <span className="text-gray-500">|</span>
-            <button
-              onClick={() => changeLanguage("ru")}
-              className="text-sm hover:text-purple-400 transition"
-            >
-              RU
-            </button>
-            <span className="text-gray-500">|</span>
-            <button
-              onClick={() => changeLanguage("en")}
-              className="text-sm hover:text-purple-400 transition"
-            >
-              EN
-            </button>
+            {["uz", "ru", "en"].map((lng, idx) => (
+              <React.Fragment key={lng}>
+                <button
+                  onClick={() => changeLanguage(lng)}
+                  className="text-sm px-2 py-1 rounded-lg 
+                    bg-white/20 dark:bg-white/10 
+                    border border-white/30 dark:border-gray-700/40 
+                    backdrop-blur-md shadow-sm hover:text-purple-400 transition"
+                >
+                  {lng.toUpperCase()}
+                </button>
+                {idx < 2 && (
+                  <span className="text-gray-500 dark:text-gray-400">|</span>
+                )}
+              </React.Fragment>
+            ))}
           </div>
 
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="ml-3 text-xl hover:text-purple-400 transition"
+            className="ml-3 text-xl p-2 rounded-full 
+              bg-white/20 dark:bg-white/10 
+              border border-white/30 dark:border-gray-700/40 
+              backdrop-blur-md shadow-sm hover:text-purple-400 transition"
             aria-label="Toggle Theme"
           >
             {theme === "dark" ? <FaSun /> : <FaMoon />}
@@ -129,7 +87,12 @@ const Navbar = ({ toggleTheme, theme }) => {
         </div>
 
         {/* Mobile menu (hamburger icon) */}
-        <button className="md:hidden text-black dark:text-white focus:outline-none">
+        <button
+          className="md:hidden text-xl p-2 rounded-lg
+            bg-white/20 dark:bg-white/10 
+            border border-white/30 dark:border-gray-700/40 
+            backdrop-blur-md shadow-sm hover:text-purple-400 transition"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-7 w-7"

@@ -37,13 +37,21 @@ const Contact = () => {
       <div className="flex flex-col md:flex-row justify-between w-full max-w-4xl gap-6">
         {/* Chap tomon */}
         <div className="space-y-4 mb-8 md:mb-0">
-          <div className="flex items-center space-x-2">
-            <FaPhoneAlt className="text-gray-500 dark:text-gray-300" />
+          <div
+            className="flex items-center space-x-2 px-3 py-2 rounded-xl
+              bg-white/20 dark:bg-white/10 backdrop-blur-md
+              border border-white/30 dark:border-gray-700/40 shadow-md"
+          >
+            <FaPhoneAlt className="text-gray-200" />
             <span className="text-sm">+998 95 969 21 12</span>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <FaEnvelope className="text-gray-500 dark:text-gray-300" />
+          <div
+            className="flex items-center space-x-2 px-3 py-2 rounded-xl
+              bg-white/20 dark:bg-white/10 backdrop-blur-md
+              border border-white/30 dark:border-gray-700/40 shadow-md"
+          >
+            <FaEnvelope className="text-gray-200" />
             <a
               href="mailto:temurbekreymberdiyev@gmail.com"
               className="text-sm font-semibold hover:underline"
@@ -52,8 +60,12 @@ const Contact = () => {
             </a>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <FaMapMarkerAlt className="text-gray-500 dark:text-gray-300" />
+          <div
+            className="flex items-center space-x-2 px-3 py-2 rounded-xl
+              bg-white/20 dark:bg-white/10 backdrop-blur-md
+              border border-white/30 dark:border-gray-700/40 shadow-md"
+          >
+            <FaMapMarkerAlt className="text-gray-200" />
             <span className="text-sm">{t("contact.location")}</span>
           </div>
         </div>
@@ -62,7 +74,10 @@ const Contact = () => {
         <div className="flex flex-col space-y-3">
           <a
             href="#"
-            className="flex items-center space-x-2 bg-[#55acee]/90 hover:bg-[#55acee] text-white px-4 py-2 rounded-xl backdrop-blur-sm shadow-md transition"
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl 
+              bg-[#55acee]/30 hover:bg-[#55acee]/50 
+              backdrop-blur-md shadow-md border border-white/20
+              text-white transition"
           >
             <FaTelegramPlane />
             <span>{t("contact.telegram")}</span>
@@ -70,7 +85,10 @@ const Contact = () => {
 
           <a
             href="#"
-            className="flex items-center space-x-2 bg-[#d64b87]/90 hover:bg-[#d64b87] text-white px-4 py-2 rounded-xl backdrop-blur-sm shadow-md transition"
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl 
+              bg-[#d64b87]/30 hover:bg-[#d64b87]/50 
+              backdrop-blur-md shadow-md border border-white/20
+              text-white transition"
           >
             <FaInstagram />
             <span>{t("contact.instagram")}</span>
@@ -78,7 +96,10 @@ const Contact = () => {
 
           <a
             href="#"
-            className="flex items-center space-x-2 bg-[#333333]/90 hover:bg-[#333333] text-white px-4 py-2 rounded-xl backdrop-blur-sm shadow-md transition"
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl 
+              bg-[#333333]/40 hover:bg-[#333333]/60 
+              backdrop-blur-md shadow-md border border-white/20
+              text-white transition"
           >
             <FaGithub />
             <span>{t("contact.github")}</span>
@@ -86,7 +107,10 @@ const Contact = () => {
 
           <a
             href="#"
-            className="flex items-center space-x-2 bg-[#2d64bc]/90 hover:bg-[#2d64bc] text-white px-4 py-2 rounded-xl backdrop-blur-sm shadow-md transition"
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl 
+              bg-[#2d64bc]/30 hover:bg-[#2d64bc]/50 
+              backdrop-blur-md shadow-md border border-white/20
+              text-white transition"
           >
             <FaLinkedin />
             <span>{t("contact.linkedin")}</span>
@@ -94,7 +118,10 @@ const Contact = () => {
         </div>
       </div>
 
-      <footer className="mt-16 text-xs text-gray-600 dark:text-gray-400 transition drop-shadow-sm">
+      <footer
+        className="mt-16 text-xs text-gray-200 dark:text-gray-400 
+          px-3 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-sm"
+      >
         {t("contact.footer")}
       </footer>
     </div>
