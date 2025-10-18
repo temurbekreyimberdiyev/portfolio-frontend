@@ -3,6 +3,8 @@ import logoDark from "../assets/logo_dark.png";
 import logoLight from "../assets/logo_light.png";
 import { useTranslation } from "react-i18next";
 import { FaMoon, FaSun } from "react-icons/fa";
+import { Link } from "react-scroll";
+
 
 const Navbar = ({ toggleTheme, theme }) => {
   const { t, i18n } = useTranslation();
@@ -15,12 +17,12 @@ const Navbar = ({ toggleTheme, theme }) => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 shadow-md 
-        bg-white dark:bg-[#0e0b1b] 
-        text-black dark:text-white 
-        transition-colors duration-500`}  // ✅ faqat rang o'zgaradi, o'lcham emas
-      style={{ height: "80px" }}  // ✅ doimiy balandlik
-    >
+  className={`fixed top-0 left-0 w-full z-50 shadow-sm
+    backdrop-blur-lg bg-white/70 dark:bg-[#0e0b1b]/60
+    text-black dark:text-white
+    transition-all duration-500 border-b border-white/20 dark:border-gray-700/40`}
+  style={{ height: "80px" }}
+>
       <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-2">
@@ -33,11 +35,62 @@ const Navbar = ({ toggleTheme, theme }) => {
 
         {/* Menu */}
         <ul className="hidden md:flex space-x-10 text-lg font-medium">
-          <li className="hover:text-purple-400 transition">{t("navbar.home")}</li>
-          <li className="hover:text-purple-400 transition">{t("navbar.projects")}</li>
-          <li className="hover:text-purple-400 transition">{t("navbar.experience")}</li>
-          <li className="hover:text-purple-400 transition">{t("navbar.contact")}</li>
-        </ul>
+  <li>
+    <Link
+      to="home"
+      smooth={true}
+      duration={500}
+      offset={-80}
+      spy={true}
+      activeClass="text-purple-400 font-semibold"
+      className="cursor-pointer hover:text-purple-400 transition"
+    >
+      {t("navbar.home")}
+    </Link>
+  </li>
+
+  <li>
+    <Link
+      to="projects"
+      smooth={true}
+      duration={500}
+      offset={-80}
+      spy={true}
+      activeClass="text-purple-400 font-semibold"
+      className="cursor-pointer hover:text-purple-400 transition"
+    >
+      {t("navbar.projects")}
+    </Link>
+  </li>
+
+  <li>
+    <Link
+      to="experience"
+      smooth={true}
+      duration={500}
+      offset={-80}
+      spy={true}
+      activeClass="text-purple-400 font-semibold"
+      className="cursor-pointer hover:text-purple-400 transition"
+    >
+      {t("navbar.experience")}
+    </Link>
+  </li>
+
+  <li>
+    <Link
+      to="contact"
+      smooth={true}
+      duration={500}
+      offset={-80}
+      spy={true}
+      activeClass="text-purple-400 font-semibold"
+      className="cursor-pointer hover:text-purple-400 transition"
+    >
+      {t("navbar.contact")}
+    </Link>
+  </li>
+</ul>
 
         {/* Language + Theme Switcher */}
         <div className="flex items-center space-x-3">

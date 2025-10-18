@@ -38,6 +38,7 @@ export default function Projects() {
 
   return (
     <section
+      name="projects"
       className="py-20 px-6 md:px-16 
       text-black 
       dark:text-white 

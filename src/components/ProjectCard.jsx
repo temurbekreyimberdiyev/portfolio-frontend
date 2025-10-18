@@ -9,33 +9,55 @@ export default function ProjectCard({ image, title, description, tech, link }) {
 
   return (
     <div
-      className="rounded-2xl overflow-hidden border hover:scale-[1.02] 
-      transition-all duration-300 shadow-lg 
-      bg-white text-black border-gray-200 
-      dark:bg-[#0f0b1e] dark:text-white dark:border-[#1e1b3a]"
+      className="
+      relative overflow-hidden 
+      rounded-3xl shadow-xl
+      bg-white/30 dark:bg-[#0e0b1b]/30
+      backdrop-blur-2xl
+      border border-white/40 dark:border-gray-700/40
+      transition-all duration-500
+      hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(255,255,255,0.15)]
+      text-black dark:text-white
+    "
     >
+      {/* Reflection highlight */}
+      <div
+        className="
+        absolute top-0 left-0 w-full h-[70px]
+        bg-gradient-to-b from-white/40 to-transparent
+        dark:from-white/10 dark:to-transparent
+        opacity-70
+        rounded-t-3xl
+        pointer-events-none
+      "
+      />
+
       {/* Project image */}
-      <img src={image} alt={title} className="w-full h-48 object-cover" />
+      <img
+        src={image}
+        alt={title}
+        className="w-full h-48 object-cover rounded-t-3xl border-b border-white/20 dark:border-gray-700/40"
+      />
 
       {/* Text content */}
       <div className="p-5 flex flex-col justify-between h-[240px]">
         {/* Title + description */}
         <div>
           <h3 className="text-lg font-semibold mb-2">{title}</h3>
-          <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+          <p className="text-gray-700 dark:text-gray-300 text-sm mb-4">
             {description}
           </p>
         </div>
 
         {/* Tech icons + link */}
         <div className="flex items-center justify-between">
-          <div className="flex gap-3 text-lg text-gray-500 dark:text-gray-300">
-            {tech.includes("react") && <FaReact className="text-cyan-500" />}
+          <div className="flex gap-3 text-lg text-gray-600 dark:text-gray-300">
+            {tech.includes("react") && <FaReact className="text-cyan-400" />}
             {tech.includes("next") && (
               <SiNextdotjs className="text-gray-900 dark:text-white" />
             )}
-            {tech.includes("ts") && <SiTypescript className="text-blue-500" />}
-            {tech.includes("three") && <TbCube className="text-purple-500" />}
+            {tech.includes("ts") && <SiTypescript className="text-blue-400" />}
+            {tech.includes("three") && <TbCube className="text-purple-400" />}
           </div>
 
           <a
