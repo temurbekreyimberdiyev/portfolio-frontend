@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
+import { Plus, Trash2, Mail, Phone, MapPin, MessageSquare, Upload, Pencil } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -13,10 +13,10 @@ const initialContactInfo = {
 };
 
 const initialSocialLinks = [
-  { id: '1', platform: 'Telegram', url: 'https://t.me/username', icon: '✈️' },
-  { id: '2', platform: 'Instagram', url: 'https://instagram.com/username', icon: '📷' },
-  { id: '3', platform: 'GitHub', url: 'https://github.com/username', icon: '💻' },
-  { id: '4', platform: 'LinkedIn', url: 'https://linkedin.com/in/username', icon: '💼' },
+  { id: '1', platform: 'Telegram', url: 'https://t.me/username', iconUrl: '/icons/telegram.png' },
+  { id: '2', platform: 'Instagram', url: 'https://instagram.com/username', iconUrl: '/icons/instagram.png' },
+  { id: '3', platform: 'GitHub', url: 'https://github.com/username', iconUrl: '/icons/github.png' },
+  { id: '4', platform: 'LinkedIn', url: 'https://linkedin.com/in/username', iconUrl: '/icons/linkedin.png' },
 ];
 
 const sampleMessages = [
@@ -38,7 +38,7 @@ const sampleMessages = [
     id: '3',
     name: 'Mike Johnson',
     email: 'mike@tech.com',
-    message: 'Your portfolio is impressive! Let\'s connect.',
+    message: "Your portfolio is impressive! Let's connect.",
     date: '2025-10-10',
   },
 ];
@@ -48,24 +48,66 @@ export default function ContactManagement() {
   const [socialLinks, setSocialLinks] = useState(initialSocialLinks);
   const [messages] = useState(sampleMessages);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [preview, setPreview] = useState(null);
+  const [editPreview, setEditPreview] = useState(null);
+  const [editingLink, setEditingLink] = useState(null);
 
   const handleDeleteSocial = (id) => {
     setSocialLinks(socialLinks.filter((s) => s.id !== id));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddSocial = (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    
+
     const newLink = {
       id: Date.now().toString(),
       platform: formData.get('platform'),
       url: formData.get('url'),
-      icon: formData.get('icon'),
+      iconUrl: preview,
     };
 
     setSocialLinks([...socialLinks, newLink]);
     setIsDialogOpen(false);
+    setPreview(null);
+  };
+
+  const handleEditSocial = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    const updatedLink = {
+      ...editingLink,
+      platform: formData.get('platform'),
+      url: formData.get('url'),
+      iconUrl: editPreview || editingLink.iconUrl,
+    };
+
+    setSocialLinks(
+      socialLinks.map((s) => (s.id === editingLink.id ? updatedLink : s))
+    );
+    setIsEditDialogOpen(false);
+    setEditingLink(null);
+    setEditPreview(null);
+  };
+
+  const handleEditFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setEditPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleUpdateContact = (field, value) => {
@@ -168,7 +210,7 @@ export default function ContactManagement() {
         <TabsContent value="social" className="mt-6">
           <div className="flex items-center justify-between mb-6">
             <p className="text-white/60">Manage your social media links</p>
-            
+
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
@@ -185,15 +227,32 @@ export default function ContactManagement() {
                     <Label htmlFor="platform">Platform Name</Label>
                     <Input id="platform" name="platform" placeholder="e.g., Twitter" className="bg-white/5 border-white/10" required />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="url">URL</Label>
                     <Input id="url" name="url" type="url" placeholder="https://..." className="bg-white/5 border-white/10" required />
                   </div>
-                  
+
                   <div>
-                    <Label htmlFor="icon">Icon / Emoji</Label>
-                    <Input id="icon" name="icon" placeholder="e.g., 🐦" className="bg-white/5 border-white/10" required />
+                    <Label htmlFor="icon">Upload Icon</Label>
+                    <div className="flex items-center gap-3">
+                      <Input
+                        id="icon"
+                        name="icon"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="bg-white/5 border-white/10"
+                      />
+                      <Upload className="w-5 h-5 text-white/70" />
+                    </div>
+                    {preview && (
+                      <img
+                        src={preview}
+                        alt="Preview"
+                        className="mt-3 w-16 h-16 object-contain rounded-lg border border-white/10"
+                      />
+                    )}
                   </div>
 
                   <div className="flex justify-end gap-2 pt-4">
@@ -209,23 +268,108 @@ export default function ContactManagement() {
             </Dialog>
           </div>
 
+          {/* Social links list */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {socialLinks.map((link) => (
               <div key={link.id} className="rounded-2xl p-6 bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
                 <div className="flex items-start justify-between mb-3">
-                  <div className="text-2xl">{link.icon}</div>
-                  <button
-                    onClick={() => handleDeleteSocial(link.id)}
-                    className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+                    {link.iconUrl ? (
+                      <img src={link.iconUrl} alt={link.platform} className="w-6 h-6 object-contain" />
+                    ) : (
+                      <span className="text-2xl">🌐</span>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingLink(link);
+                        setEditPreview(link.iconUrl);
+                        setIsEditDialogOpen(true);
+                      }}
+                      className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSocial(link.id)}
+                      className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <h4 className="mb-1">{link.platform}</h4>
                 <p className="text-sm text-white/50 truncate">{link.url}</p>
               </div>
             ))}
           </div>
+
+          {/* Edit Dialog */}
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="bg-[#0a0a1a] border-white/10 text-white">
+              <DialogHeader>
+                <DialogTitle>Edit Social Link</DialogTitle>
+              </DialogHeader>
+              {editingLink && (
+                <form onSubmit={handleEditSocial} className="space-y-4">
+                  <div>
+                    <Label htmlFor="platform">Platform Name</Label>
+                    <Input
+                      id="platform"
+                      name="platform"
+                      defaultValue={editingLink.platform}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="url">URL</Label>
+                    <Input
+                      id="url"
+                      name="url"
+                      type="url"
+                      defaultValue={editingLink.url}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="icon">Change Icon</Label>
+                    <div className="flex items-center gap-3">
+                      <Input
+                        id="icon"
+                        name="icon"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleEditFileChange}
+                        className="bg-white/5 border-white/10"
+                      />
+                      <Upload className="w-5 h-5 text-white/70" />
+                    </div>
+                    {editPreview && (
+                      <img
+                        src={editPreview}
+                        alt="Preview"
+                        className="mt-3 w-16 h-16 object-contain rounded-lg border border-white/10"
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} className="border-white/10">
+                      Cancel
+                    </Button>
+                    <Button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500">
+                      Save Changes
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         {/* MESSAGES TAB */}

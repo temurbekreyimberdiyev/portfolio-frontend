@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Upload, Pencil } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,53 +12,64 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
 const initialSkills = [
-  { id: "1", name: "JavaScript", icon: "📜", color: "from-yellow-500 to-yellow-600" },
-  { id: "2", name: "React", icon: "⚛️", color: "from-blue-500 to-blue-600" },
-  { id: "3", name: "TypeScript", icon: "📘", color: "from-blue-600 to-blue-700" },
-  { id: "4", name: "Node.js", icon: "🟢", color: "from-green-500 to-green-600" },
-  { id: "5", name: "MongoDB", icon: "🍃", color: "from-green-600 to-green-700" },
-  { id: "6", name: "PostgreSQL", icon: "🐘", color: "from-blue-700 to-blue-800" },
-  { id: "7", name: "Docker", icon: "🐳", color: "from-blue-500 to-cyan-500" },
-  { id: "8", name: "Git", icon: "🔀", color: "from-orange-500 to-red-500" },
-  { id: "9", name: "Figma", icon: "🎨", color: "from-purple-500 to-pink-500" },
-  { id: "10", name: "Next.js", icon: "▲", color: "from-gray-700 to-gray-900" },
-  { id: "11", name: "Tailwind CSS", icon: "💨", color: "from-cyan-500 to-blue-500" },
-  { id: "12", name: "GraphQL", icon: "◼️", color: "from-pink-500 to-purple-500" },
+  { id: "1", name: "JavaScript", iconUrl: "/icons/js.png" },
+  { id: "2", name: "React", iconUrl: "/icons/react.png" },
+  { id: "3", name: "Node.js", iconUrl: "/icons/node.png" },
 ];
 
 export default function SkillsManagement() {
   const [skills, setSkills] = useState(initialSkills);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingSkill, setEditingSkill] = useState(null);
+  const [preview, setPreview] = useState(null);
 
   const handleDelete = (id) => {
     setSkills(skills.filter((s) => s.id !== id));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const name = formData.get("name");
 
-    const newSkill = {
-      id: Date.now().toString(),
-      name: formData.get("name"),
-      icon: formData.get("icon"),
-      color: formData.get("color"),
-    };
+    if (editingSkill) {
+      // Update existing skill
+      setSkills((prev) =>
+        prev.map((s) =>
+          s.id === editingSkill.id
+            ? { ...s, name, iconUrl: preview || s.iconUrl }
+            : s
+        )
+      );
+    } else {
+      // Add new skill
+      const newSkill = {
+        id: Date.now().toString(),
+        name,
+        iconUrl: preview,
+      };
+      setSkills([...skills, newSkill]);
+    }
 
-    setSkills([...skills, newSkill]);
+    setPreview(null);
+    setEditingSkill(null);
     setIsDialogOpen(false);
   };
 
-  const colorOptions = [
-    { label: "Purple", value: "from-purple-500 to-purple-600" },
-    { label: "Blue", value: "from-blue-500 to-blue-600" },
-    { label: "Green", value: "from-green-500 to-green-600" },
-    { label: "Yellow", value: "from-yellow-500 to-yellow-600" },
-    { label: "Red", value: "from-red-500 to-red-600" },
-    { label: "Pink", value: "from-pink-500 to-pink-600" },
-    { label: "Teal", value: "from-teal-500 to-teal-600" },
-    { label: "Orange", value: "from-orange-500 to-orange-600" },
-  ];
+  const openEditDialog = (skill) => {
+    setEditingSkill(skill);
+    setPreview(skill.iconUrl);
+    setIsDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -72,59 +83,70 @@ export default function SkillsManagement() {
         {/* Add Skill Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+            <Button
+              onClick={() => {
+                setEditingSkill(null);
+                setPreview(null);
+                setIsDialogOpen(true);
+              }}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Skill
             </Button>
           </DialogTrigger>
           <DialogContent className="bg-[#0a0a1a] border-white/10 text-white">
             <DialogHeader>
-              <DialogTitle>Add New Skill</DialogTitle>
+              <DialogTitle>
+                {editingSkill ? "Edit Skill" : "Add New Skill"}
+              </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSave} className="space-y-4">
+              {/* Skill Name */}
               <div>
                 <Label htmlFor="name">Skill Name</Label>
                 <Input
                   id="name"
                   name="name"
                   placeholder="e.g., React"
+                  defaultValue={editingSkill?.name || ""}
                   className="bg-white/5 border-white/10"
                   required
                 />
               </div>
 
+              {/* Icon Upload */}
               <div>
-                <Label htmlFor="icon">Icon / Emoji</Label>
-                <Input
-                  id="icon"
-                  name="icon"
-                  placeholder="e.g., ⚛️"
-                  className="bg-white/5 border-white/10"
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="color">Color Theme</Label>
-                <select
-                  id="color"
-                  name="color"
-                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
-                  required
-                >
-                  {colorOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <Label htmlFor="icon">Skill Icon</Label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    id="icon"
+                    name="icon"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="bg-white/5 border-white/10"
+                  />
+                  <Upload className="w-5 h-5 text-white/70" />
+                </div>
+                {preview && (
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="mt-3 w-16 h-16 object-contain rounded-lg border border-white/10"
+                  />
+                )}
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
+                  onClick={() => {
+                    setPreview(null);
+                    setEditingSkill(null);
+                    setIsDialogOpen(false);
+                  }}
                   className="border-white/10"
                 >
                   Cancel
@@ -133,7 +155,7 @@ export default function SkillsManagement() {
                   type="submit"
                   className="bg-gradient-to-r from-purple-500 to-blue-500"
                 >
-                  Add Skill
+                  {editingSkill ? "Save Changes" : "Add Skill"}
                 </Button>
               </div>
             </form>
@@ -148,18 +170,32 @@ export default function SkillsManagement() {
             key={skill.id}
             className="group relative rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all"
           >
-            <button
-              onClick={() => handleDelete(skill.id)}
-              className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <Trash2 className="w-3 h-3" />
-            </button>
+            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => openEditDialog(skill)}
+                className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
+              <button
+                onClick={() => handleDelete(skill.id)}
+                className="p-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
 
             <div className="flex flex-col items-center gap-3">
-              <div
-                className={`w-12 h-12 rounded-xl bg-gradient-to-br ${skill.color} flex items-center justify-center text-2xl`}
-              >
-                {skill.icon}
+              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
+                {skill.iconUrl ? (
+                  <img
+                    src={skill.iconUrl}
+                    alt={skill.name}
+                    className="w-8 h-8 object-contain rounded-md"
+                  />
+                ) : (
+                  <span className="text-2xl">⚙️</span>
+                )}
               </div>
               <span className="text-center text-sm">{skill.name}</span>
             </div>

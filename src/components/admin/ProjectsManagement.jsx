@@ -1,27 +1,36 @@
 import React, { useState } from "react";
-import { Plus, Edit2, Trash2, ExternalLink } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Plus, Edit2, Trash2, ExternalLink, Upload } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 
+const mockSkills = ["React", "Next.js", "Node.js", "MongoDB", "PostgreSQL", "TailwindCSS", "Docker"];
+
 const initialProjects = [
   {
     id: "1",
     title: "E-commerce Platform",
-    description: "Full-stack online shopping platform with cart and payment integration",
-    tags: ["Web App", "E-commerce"],
+    description:
+      "Full-stack online shopping platform with cart and payment integration",
     techStack: ["React", "Node.js", "MongoDB"],
     link: "https://example.com",
+    image: null,
   },
   {
     id: "2",
     title: "Task Management App",
     description: "Collaborative task management with real-time updates",
-    tags: ["SaaS", "Productivity"],
     techStack: ["Next.js", "PostgreSQL", "Prisma"],
     link: "https://example.com",
+    image: null,
   },
 ];
 
@@ -29,6 +38,8 @@ export default function Projects() {
   const [projects, setProjects] = useState(initialProjects);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [selectedTech, setSelectedTech] = useState([]);
 
   const handleDelete = (id) => {
     setProjects(projects.filter((p) => p.id !== id));
@@ -36,7 +47,26 @@ export default function Projects() {
 
   const handleEdit = (project) => {
     setEditingProject(project);
+    setSelectedTech(project.techStack || []);
+    setPreviewImage(project.image || null);
     setIsDialogOpen(true);
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPreviewImage(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleTechToggle = (tech) => {
+    setSelectedTech((prev) =>
+      prev.includes(tech)
+        ? prev.filter((t) => t !== tech)
+        : [...prev, tech]
+    );
   };
 
   const handleSave = (e) => {
@@ -47,9 +77,9 @@ export default function Projects() {
       id: editingProject?.id || Date.now().toString(),
       title: formData.get("title"),
       description: formData.get("description"),
-      tags: formData.get("tags") ? formData.get("tags").split(",").map((t) => t.trim()) : [],
-      techStack: formData.get("techStack") ? formData.get("techStack").split(",").map((t) => t.trim()) : [],
+      techStack: selectedTech,
       link: formData.get("link"),
+      image: previewImage,
     };
 
     if (editingProject) {
@@ -60,6 +90,8 @@ export default function Projects() {
 
     setIsDialogOpen(false);
     setEditingProject(null);
+    setSelectedTech([]);
+    setPreviewImage(null);
   };
 
   return (
@@ -74,7 +106,11 @@ export default function Projects() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button
-              onClick={() => setEditingProject(null)}
+              onClick={() => {
+                setEditingProject(null);
+                setSelectedTech([]);
+                setPreviewImage(null);
+              }}
               className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -84,10 +120,13 @@ export default function Projects() {
 
           <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-2xl">
             <DialogHeader>
-              <DialogTitle>{editingProject ? "Edit Project" : "Add New Project"}</DialogTitle>
+              <DialogTitle>
+                {editingProject ? "Edit Project" : "Add New Project"}
+              </DialogTitle>
             </DialogHeader>
 
             <form onSubmit={handleSave} className="space-y-4">
+              {/* Project Title */}
               <div>
                 <Label htmlFor="title">Project Title</Label>
                 <Input
@@ -99,6 +138,7 @@ export default function Projects() {
                 />
               </div>
 
+              {/* Description */}
               <div>
                 <Label htmlFor="description">Description</Label>
                 <Textarea
@@ -111,28 +151,62 @@ export default function Projects() {
                 />
               </div>
 
+              {/* Image Upload */}
               <div>
-                <Label htmlFor="tags">Tags (comma-separated)</Label>
-                <Input
-                  id="tags"
-                  name="tags"
-                  defaultValue={editingProject?.tags?.join(", ")}
-                  placeholder="Web App, SaaS, Mobile"
-                  className="bg-white/5 border-white/10"
-                />
+                <Label>Project Image</Label>
+                <div className="mt-2 flex items-center gap-4">
+                  {previewImage ? (
+                    <img
+                      src={previewImage}
+                      alt="Preview"
+                      className="w-24 h-24 rounded-lg object-cover border border-white/10"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/40">
+                      No Image
+                    </div>
+                  )}
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                      <Upload className="w-4 h-4" />
+                      <span>Upload</span>
+                    </div>
+                  </label>
+                </div>
               </div>
 
+              {/* Tech Stack Selection */}
               <div>
-                <Label htmlFor="techStack">Tech Stack (comma-separated)</Label>
-                <Input
-                  id="techStack"
-                  name="techStack"
-                  defaultValue={editingProject?.techStack?.join(", ")}
-                  placeholder="React, Node.js, MongoDB"
-                  className="bg-white/5 border-white/10"
-                />
+                <Label>Tech Stack</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+                  {mockSkills.map((tech) => (
+                    <label
+                      key={tech}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${
+                        selectedTech.includes(tech)
+                          ? "bg-purple-500/20 border-purple-500 text-purple-300"
+                          : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTech.includes(tech)}
+                        onChange={() => handleTechToggle(tech)}
+                        className="hidden"
+                      />
+                      {tech}
+                    </label>
+                  ))}
+                </div>
               </div>
 
+              {/* Link */}
               <div>
                 <Label htmlFor="link">Project Link</Label>
                 <Input
@@ -146,6 +220,7 @@ export default function Projects() {
                 />
               </div>
 
+              {/* Buttons */}
               <div className="flex justify-end gap-2 pt-4">
                 <Button
                   type="button"
@@ -158,7 +233,10 @@ export default function Projects() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500">
+                <Button
+                  type="submit"
+                  className="bg-gradient-to-r from-purple-500 to-blue-500"
+                >
                   Save Project
                 </Button>
               </div>
@@ -174,6 +252,14 @@ export default function Projects() {
             key={project.id}
             className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all"
           >
+            {project.image && (
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-48 object-cover rounded-xl mb-4 border border-white/10"
+              />
+            )}
+
             <div className="flex items-start justify-between mb-4">
               <h3 className="text-xl">{project.title}</h3>
               <div className="flex gap-2">
@@ -193,17 +279,6 @@ export default function Projects() {
             </div>
 
             <p className="text-white/60 mb-4">{project.description}</p>
-
-            <div className="flex flex-wrap gap-2 mb-4">
-              {project.tags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
 
             <div className="flex flex-wrap gap-2 mb-4">
               {project.techStack.map((tech, idx) => (
