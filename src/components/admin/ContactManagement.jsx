@@ -1,57 +1,114 @@
-import { useState } from 'react';
-import { Plus, Trash2, Mail, Phone, MapPin, MessageSquare, Upload, Pencil } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { useState } from "react";
+import {
+  Plus,
+  Trash2,
+  Mail,
+  Phone,
+  MapPin,
+  MessageSquare,
+  Upload,
+  Pencil,
+  CheckCircle2,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 const initialContactInfo = {
-  phone: '+998 90 123 45 67',
-  email: 'developer@example.com',
-  address: 'Tashkent, Uzbekistan',
+  phone: "+998 90 123 45 67",
+  email: "developer@example.com",
+  address: "Tashkent, Uzbekistan",
 };
 
 const initialSocialLinks = [
-  { id: '1', platform: 'Telegram', url: 'https://t.me/username', iconUrl: '/icons/telegram.png' },
-  { id: '2', platform: 'Instagram', url: 'https://instagram.com/username', iconUrl: '/icons/instagram.png' },
-  { id: '3', platform: 'GitHub', url: 'https://github.com/username', iconUrl: '/icons/github.png' },
-  { id: '4', platform: 'LinkedIn', url: 'https://linkedin.com/in/username', iconUrl: '/icons/linkedin.png' },
+  {
+    id: "1",
+    platform: "Telegram",
+    url: "https://t.me/username",
+    iconUrl: "/icons/telegram.png",
+  },
+  {
+    id: "2",
+    platform: "Instagram",
+    url: "https://instagram.com/username",
+    iconUrl: "/icons/instagram.png",
+  },
+  {
+    id: "3",
+    platform: "GitHub",
+    url: "https://github.com/username",
+    iconUrl: "/icons/github.png",
+  },
+  {
+    id: "4",
+    platform: "LinkedIn",
+    url: "https://linkedin.com/in/username",
+    iconUrl: "/icons/linkedin.png",
+  },
 ];
 
 const sampleMessages = [
   {
-    id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    message: 'Hi! I would like to discuss a project with you.',
-    date: '2025-10-15',
+    id: "1",
+    name: "John Doe",
+    email: "john@example.com",
+    phone: "+1234567890",
+    message: "Hi! I would like to discuss a project with you.",
+    date: "2025-10-15",
+    read: false,
   },
   {
-    id: '2',
-    name: 'Sarah Smith',
-    email: 'sarah@company.com',
-    message: 'We are looking for a developer for our startup. Are you available?',
-    date: '2025-10-12',
+    id: "2",
+    name: "Sarah Smith",
+    email: "sarah@company.com",
+    phone: "+1987654321",
+    message:
+      "We are looking for a developer for our startup. Are you available?",
+    date: "2025-10-12",
+    read: true,
   },
   {
-    id: '3',
-    name: 'Mike Johnson',
-    email: 'mike@tech.com',
+    id: "3",
+    name: "Mike Johnson",
+    email: "mike@tech.com",
+    phone: "+1122334455",
     message: "Your portfolio is impressive! Let's connect.",
-    date: '2025-10-10',
+    date: "2025-10-10",
+    read: false,
   },
 ];
 
 export default function ContactManagement() {
   const [contactInfo, setContactInfo] = useState(initialContactInfo);
   const [socialLinks, setSocialLinks] = useState(initialSocialLinks);
-  const [messages] = useState(sampleMessages);
+  const [messages, setMessages] = useState(sampleMessages);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [preview, setPreview] = useState(null);
   const [editPreview, setEditPreview] = useState(null);
   const [editingLink, setEditingLink] = useState(null);
+
+  // 🔹 Xabarni o‘qilgan deb belgilash yoki qayta o‘qilmagan qilish
+  const toggleRead = (id) => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === id ? { ...msg, read: !msg.read } : msg
+      )
+    );
+  };
+
+  // 🔹 Xabarni o‘chirish
+  const deleteMessage = (id) => {
+    setMessages((prev) => prev.filter((msg) => msg.id !== id));
+  };
 
   const handleDeleteSocial = (id) => {
     setSocialLinks(socialLinks.filter((s) => s.id !== id));
@@ -72,8 +129,8 @@ export default function ContactManagement() {
 
     const newLink = {
       id: Date.now().toString(),
-      platform: formData.get('platform'),
-      url: formData.get('url'),
+      platform: formData.get("platform"),
+      url: formData.get("url"),
       iconUrl: preview,
     };
 
@@ -88,8 +145,8 @@ export default function ContactManagement() {
 
     const updatedLink = {
       ...editingLink,
-      platform: formData.get('platform'),
-      url: formData.get('url'),
+      platform: formData.get("platform"),
+      url: formData.get("url"),
       iconUrl: editPreview || editingLink.iconUrl,
     };
 
@@ -372,32 +429,73 @@ export default function ContactManagement() {
           </Dialog>
         </TabsContent>
 
-        {/* MESSAGES TAB */}
         <TabsContent value="messages" className="mt-6">
-          <div className="space-y-4">
-            {messages.map((msg) => (
-              <div key={msg.id} className="rounded-2xl p-6 bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                    <MessageSquare className="w-5 h-5" />
+      <div className="space-y-4">
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`rounded-2xl p-6 border transition-all ${
+              msg.read
+                ? "bg-white/5 border-white/10"
+                : "bg-blue-500/10 border-blue-500/30"
+            } hover:bg-white/10`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+
+              <div className="flex-1">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 className="font-semibold">{msg.name}</h4>
+                    <p className="text-sm text-white/50">{msg.email}</p>
+                    <p className="text-sm text-white/50">{msg.phone}</p>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h4>{msg.name}</h4>
-                        <p className="text-sm text-white/50">{msg.email}</p>
-                      </div>
-                      <span className="text-sm text-white/40">
-                        {new Date(msg.date).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p className="text-white/70">{msg.message}</p>
-                  </div>
+                  <span className="text-sm text-white/40">
+                    {new Date(msg.date).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <p className="text-white/70 mb-3">{msg.message}</p>
+
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => toggleRead(msg.id)}
+                    variant="outline"
+                    size="sm"
+                    className={`${
+                      msg.read
+                        ? "border-green-500 text-green-400 hover:bg-green-500/10"
+                        : "border-blue-500 text-blue-400 hover:bg-blue-500/10"
+                    }`}
+                  >
+                    <CheckCircle2 className="w-4 h-4 mr-1" />
+                    {msg.read ? "Unread" : "Mark as Read"}
+                  </Button>
+
+                  <Button
+                    onClick={() => deleteMessage(msg.id)}
+                    variant="outline"
+                    size="sm"
+                    className="border-red-500 text-red-400 hover:bg-red-500/10"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Delete
+                  </Button>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        </TabsContent>
+        ))}
+
+        {messages.length === 0 && (
+          <p className="text-center text-white/40 mt-6">
+            No messages available.
+          </p>
+        )}
+      </div>
+    </TabsContent>
       </Tabs>
     </div>
   );

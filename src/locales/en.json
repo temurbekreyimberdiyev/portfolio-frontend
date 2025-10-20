@@ -68,6 +68,14 @@
     "instagram": "Instagram",
     "github": "Github",
     "linkedin": "Linkedin",
-    "footer": "Copyright ©2025 Temurbek Reyimberdiyev"
+    "footer": "Copyright ©2025 Temurbek Reyimberdiyev",
+    "sendMessage": "Send Message",
+    "contactInfo": "Info",
+    "socials": "Socials",
+    "name" : "Your Name",
+    "email": "Your Email",
+    "phone": "Your Phone",
+    "message": "Your Message",
+    "submit": "Submit"
   }
 }

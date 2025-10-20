@@ -68,6 +68,14 @@
     "instagram": "Instagram",
     "github": "Github",
     "linkedin": "Linkedin",
-    "footer": "Mualliflik huquqi ©2025 Temurbek Reyimberdiyev"
+    "footer": "Mualliflik huquqi ©2025 Temurbek Reyimberdiyev",
+    "sendMessage": "Xabar yuborish",
+    "contactInfo": "Ma'lumotlar",
+    "socials": "Ijtimoiy tarmoqlar",
+    "name" : "Ismingiz",
+    "email": "Elektron pochta",
+    "phone": "Telefon",
+    "message": "Xabaringiz",
+    "submit": "Yuborish"
   }
 }
