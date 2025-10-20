@@ -30,7 +30,6 @@ export default function ExperienceItem({ company, role, period, description }) {
           </p>
         </div>
       </div>
-
       <span className="mt-3 sm:mt-0 text-sm text-gray-600 dark:text-gray-400">
         {t(period)}
       </span>

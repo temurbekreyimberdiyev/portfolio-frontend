@@ -1,19 +1,25 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import profil from "../assets/avatar.png";
-
+import { Link } from "react-scroll";
 const Hero = () => {
   const { t } = useTranslation();
 
   return (
     <section
-      name="home"
-      className="
-        min-h-screen flex flex-col items-center justify-center px-4 text-center pt-20
-        text-black dark:text-white
-        transition-colors duration-500
-      "
-    >
+  name="home"
+  className="
+    min-h-screen 
+    flex flex-col items-center justify-center 
+    px-4 
+    text-center 
+    pt-4 sm:pt-20 md:pt-24
+    text-black dark:text-white
+    transition-colors duration-500
+  "
+>
+
+
       {/* Avatar */}
       <div
         className="
@@ -59,21 +65,27 @@ const Hero = () => {
 
       {/* Buttons */}
       <div className="flex space-x-4 mt-8">
-        {/* Contact Button */}
-        <button
-          className="
-            px-6 py-3 rounded-full font-semibold
-            bg-gradient-to-r from-purple-500/40 to-pink-500/40
-            backdrop-blur-lg
-            text-white
-            border border-white/30
-            shadow-lg
-            hover:from-purple-600/60 hover:to-pink-600/60
-            transition
-          "
-        >
-          {t("hero.btn_contact")}
-        </button>
+        <Link
+  to="contact"          // section name
+  smooth={true}         // smooth scroll
+  duration={500}        // scroll davomiyligi (ms)
+  offset={-80}          // navbar balandligini hisobga olish
+>
+  <button
+    className="
+      px-6 py-3 rounded-full font-semibold
+      bg-gradient-to-r from-purple-500/40 to-pink-500/40
+      backdrop-blur-lg
+      text-white
+      border border-white/30
+      shadow-lg
+      hover:from-purple-600/60 hover:to-pink-600/60
+      transition
+    "
+  >
+    {t("hero.btn_contact")}
+  </button>
+</Link>
 
         {/* CV Button */}
         <button
