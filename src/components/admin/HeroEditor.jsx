@@ -9,6 +9,7 @@ export default function HeroEditor() {
   const [language, setLanguage] = useState("en");
   const [avatarUrl, setAvatarUrl] = useState(exampleAvatar);
   const [cvFile, setCvFile] = useState(null);
+  const [showCvPreview, setShowCvPreview] = useState(false);
 
   const [texts, setTexts] = useState({
     en: {
@@ -33,8 +34,6 @@ export default function HeroEditor() {
       buttonText: "Связаться",
     },
   });
-
-  const [showCvPreview, setShowCvPreview] = useState(false);
 
   useEffect(() => {
     const savedData = localStorage.getItem("heroData");
@@ -83,24 +82,25 @@ export default function HeroEditor() {
 
   return (
     <div className="space-y-6 text-white">
-      <div className="flex items-center justify-between">
+      {/* HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl mb-2">Hero Section Editor</h2>
+          <h2 className="text-3xl mb-1">Hero Section Editor</h2>
           <p className="text-white/60">Customize your hero section content</p>
         </div>
 
         {/* LANGUAGE SWITCH */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Globe className="w-5 h-5 text-white/70" />
           {["uz", "en", "ru"].map((lang) => (
             <Button
               key={lang}
               onClick={() => setLanguage(lang)}
               variant={language === lang ? "default" : "outline"}
-              className={`uppercase ${
+              className={`uppercase px-4 py-2 text-sm ${
                 language === lang
                   ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
-                  : "border-white/20 text-white/70"
+                  : "border-white/20 text-white/70 hover:text-white"
               }`}
             >
               {lang}
@@ -109,13 +109,14 @@ export default function HeroEditor() {
         </div>
       </div>
 
+      {/* MAIN GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* LEFT PANEL */}
         <div className="space-y-6">
           {/* Avatar */}
           <div className="rounded-2xl p-6 bg-white/5 border border-white/10">
             <Label>Avatar Image</Label>
-            <div className="mt-4 flex items-center gap-6">
+            <div className="mt-4 flex flex-col sm:flex-row items-center gap-6">
               <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/20">
                 <img
                   src={avatarUrl}
@@ -123,24 +124,22 @@ export default function HeroEditor() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div>
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
-                    <Upload className="w-4 h-4" />
-                    <span>Upload New</span>
-                  </div>
-                </label>
-              </div>
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm sm:text-base">
+                  <Upload className="w-4 h-4" />
+                  <span>Upload New</span>
+                </div>
+              </label>
             </div>
           </div>
 
-          {/* CV */}
+          {/* CV UPLOAD */}
           <div className="rounded-2xl p-6 bg-white/5 border border-white/10">
             <Label>CV File</Label>
             <div className="mt-4 flex flex-col gap-3">
@@ -152,15 +151,15 @@ export default function HeroEditor() {
                     onChange={handleCvUpload}
                     className="hidden"
                   />
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm sm:text-base">
                     <Upload className="w-4 h-4" />
                     <span>Upload CV (.pdf)</span>
                   </div>
                 </label>
               ) : (
-                <div className="flex items-center justify-between bg-white/5 px-4 py-2 rounded-md">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-white/5 px-4 py-2 rounded-md">
                   <span className="text-sm truncate">{cvFile.name}</span>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 justify-end">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -185,45 +184,29 @@ export default function HeroEditor() {
 
           {/* TEXT INPUTS */}
           <div className="rounded-2xl p-6 bg-white/5 border border-white/10 space-y-4">
-            <div>
-              <Label>Intro Text ({language.toUpperCase()})</Label>
-              <Input
-                value={texts[language].intro}
-                onChange={(e) => updateText("intro", e.target.value)}
-                className="bg-white/5 border-white/10 mt-2"
-              />
-            </div>
-
-            <div>
-              <Label>Colored Intro Text ({language.toUpperCase()})</Label>
-              <Input
-                value={texts[language].introColorText}
-                onChange={(e) => updateText("introColorText", e.target.value)}
-                className="bg-white/5 border-white/10 mt-2"
-              />
-            </div>
-
-            <div>
-              <Label>Description ({language.toUpperCase()})</Label>
-              <Input
-                value={texts[language].description}
-                onChange={(e) => updateText("description", e.target.value)}
-                className="bg-white/5 border-white/10 mt-2"
-              />
-            </div>
-
-            <div>
-              <Label>Button Text ({language.toUpperCase()})</Label>
-              <Input
-                value={texts[language].buttonText}
-                onChange={(e) => updateText("buttonText", e.target.value)}
-                className="bg-white/5 border-white/10 mt-2"
-              />
-            </div>
-
+            {["intro", "introColorText", "description", "buttonText"].map(
+              (field) => (
+                <div key={field}>
+                  <Label>
+                    {field === "intro"
+                      ? `Intro Text (${language.toUpperCase()})`
+                      : field === "introColorText"
+                      ? `Colored Intro Text (${language.toUpperCase()})`
+                      : field === "description"
+                      ? `Description (${language.toUpperCase()})`
+                      : `Button Text (${language.toUpperCase()})`}
+                  </Label>
+                  <Input
+                    value={texts[language][field]}
+                    onChange={(e) => updateText(field, e.target.value)}
+                    className="bg-white/5 border-white/10 mt-2 text-sm sm:text-base"
+                  />
+                </div>
+              )
+            )}
             <Button
               onClick={handleSave}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+              className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-sm sm:text-base"
             >
               Save Changes
             </Button>
@@ -231,12 +214,12 @@ export default function HeroEditor() {
         </div>
 
         {/* RIGHT PANEL (PREVIEW) */}
-        <div className="rounded-2xl p-8 bg-white/5 border border-white/10">
+        <div className="rounded-2xl p-6 sm:p-8 bg-white/5 border border-white/10 text-center">
           <h3 className="text-lg mb-4 text-white/60">
             Preview ({language.toUpperCase()})
           </h3>
-          <div className="text-center space-y-6">
-            <div className="relative w-36 h-36 mx-auto rounded-full p-[3px] bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400">
+          <div className="space-y-6">
+            <div className="relative w-28 sm:w-36 h-28 sm:h-36 mx-auto rounded-full p-[3px] bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400">
               <img
                 src={avatarUrl}
                 alt="Avatar"
@@ -244,18 +227,20 @@ export default function HeroEditor() {
               />
             </div>
 
-            <div className="space-y-2">
-              <h1 className="text-4xl font-bold">{texts[language].intro}</h1>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+            <div className="space-y-2 px-2">
+              <h1 className="text-2xl sm:text-4xl font-bold">
+                {texts[language].intro}
+              </h1>
+              <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
                 {texts[language].introColorText}
               </h1>
-              <p className="max-w-xl mx-auto text-white/70">
+              <p className="max-w-xl mx-auto text-white/70 text-sm sm:text-base">
                 {texts[language].description}
               </p>
             </div>
 
-            <div className="flex gap-3 justify-center">
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <Button className="bg-gradient-to-r from-purple-500 to-pink-500 w-full sm:w-auto">
                 {texts[language].buttonText}
               </Button>
               {cvFile && (
@@ -264,8 +249,12 @@ export default function HeroEditor() {
                   download={cvFile.name}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="w-full sm:w-auto"
                 >
-                  <Button variant="outline" className="border-white/20">
+                  <Button
+                    variant="outline"
+                    className="border-white/20 w-full sm:w-auto"
+                  >
                     Download CV
                   </Button>
                 </a>
@@ -275,10 +264,10 @@ export default function HeroEditor() {
         </div>
       </div>
 
-      {/* PDF PREVIEW */}
+      {/* PDF PREVIEW MODAL */}
       {showCvPreview && cvFile && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-neutral-900 rounded-xl w-11/12 md:w-3/4 h-[80vh] p-4 relative">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-neutral-900 rounded-xl w-full max-w-5xl h-[80vh] p-4 relative">
             <button
               onClick={() => setShowCvPreview(false)}
               className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white rounded-full px-3 py-1"

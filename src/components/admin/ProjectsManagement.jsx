@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Edit2, Trash2, ExternalLink, Upload, Globe } from "lucide-react";
+import { Plus, Edit2, Trash2, ExternalLink, Upload } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -56,10 +56,7 @@ export default function Projects() {
   const [previewImage, setPreviewImage] = useState(null);
   const [selectedTech, setSelectedTech] = useState([]);
   const [language, setLanguage] = useState("uz");
-
-  // for form only
   const [formLanguage, setFormLanguage] = useState("uz");
-
   const [title, setTitle] = useState({ uz: "", en: "", ru: "" });
   const [description, setDescription] = useState({ uz: "", en: "", ru: "" });
 
@@ -88,9 +85,7 @@ export default function Projects() {
 
   const handleTechToggle = (tech) => {
     setSelectedTech((prev) =>
-      prev.includes(tech)
-        ? prev.filter((t) => t !== tech)
-        : [...prev, tech]
+      prev.includes(tech) ? prev.filter((t) => t !== tech) : [...prev, tech]
     );
   };
 
@@ -158,17 +153,18 @@ export default function Projects() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-3xl mb-2">Projects Management</h2>
-          <p className="text-white/60">Manage your portfolio projects (UZ / EN / RU)</p>
+          <h2 className="text-2xl sm:text-3xl mb-2">Projects Management</h2>
+          <p className="text-white/60 text-sm sm:text-base">
+            Manage your portfolio projects (UZ / EN / RU)
+          </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-end w-full sm:w-auto">
           <LanguageSwitcher />
-
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
@@ -180,25 +176,25 @@ export default function Projects() {
                   setDescription({ uz: "", en: "", ru: "" });
                   setFormLanguage("uz");
                 }}
-                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Project
               </Button>
             </DialogTrigger>
 
-            <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-2xl">
+            {/* MODAL — RESPONSIVE DESIGN */}
+            <DialogContent className="bg-[#0a0a1a] border-white/10 text-white w-[95vw] sm:w-[90vw] md:w-[700px] max-h-[90vh] overflow-y-auto rounded-2xl p-4 sm:p-6">
               <DialogHeader>
-                <DialogTitle>
+                <DialogTitle className="text-lg sm:text-xl text-center sm:text-left">
                   {editingProject ? "Edit Project" : "Add New Project"}
                 </DialogTitle>
               </DialogHeader>
 
-              {/* Form language switcher (local) */}
               <FormLanguageSwitcher />
 
               <form onSubmit={handleSave} className="space-y-4">
-                {/* Title field */}
+                {/* Title */}
                 <div>
                   <Label htmlFor={`title_${formLanguage}`}>
                     Title ({formLanguage.toUpperCase()})
@@ -214,7 +210,7 @@ export default function Projects() {
                   />
                 </div>
 
-                {/* Description field */}
+                {/* Description */}
                 <div>
                   <Label htmlFor={`desc_${formLanguage}`}>
                     Description ({formLanguage.toUpperCase()})
@@ -224,16 +220,19 @@ export default function Projects() {
                     rows={3}
                     value={description[formLanguage]}
                     onChange={(e) =>
-                      setDescription({ ...description, [formLanguage]: e.target.value })
+                      setDescription({
+                        ...description,
+                        [formLanguage]: e.target.value,
+                      })
                     }
                     className="bg-white/5 border-white/10"
                   />
                 </div>
 
-                {/* Image upload */}
+                {/* Image Upload */}
                 <div>
                   <Label>Project Image</Label>
-                  <div className="mt-2 flex items-center gap-4">
+                  <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     {previewImage ? (
                       <img
                         src={previewImage}
@@ -245,14 +244,14 @@ export default function Projects() {
                         No Image
                       </div>
                     )}
-                    <label className="cursor-pointer">
+                    <label className="cursor-pointer w-full sm:w-auto">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleImageUpload}
                         className="hidden"
                       />
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                      <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
                         <Upload className="w-4 h-4" />
                         <span>Upload</span>
                       </div>
@@ -300,7 +299,7 @@ export default function Projects() {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex justify-end gap-2 pt-4">
+                <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
                   <Button
                     type="button"
                     variant="outline"
@@ -308,13 +307,13 @@ export default function Projects() {
                       setIsDialogOpen(false);
                       setEditingProject(null);
                     }}
-                    className="border-white/10"
+                    className="border-white/10 w-full sm:w-auto"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-gradient-to-r from-purple-500 to-blue-500"
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 w-full sm:w-auto"
                   >
                     Save Project
                   </Button>
@@ -326,22 +325,22 @@ export default function Projects() {
       </div>
 
       {/* Projects Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {projects.map((project) => (
           <div
             key={project.id}
-            className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all"
+            className="rounded-2xl p-5 sm:p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all"
           >
             {project.image && (
               <img
                 src={project.image}
                 alt={project.title[language]}
-                className="w-full h-48 object-cover rounded-xl mb-4 border border-white/10"
+                className="w-full h-44 sm:h-48 object-cover rounded-xl mb-4 border border-white/10"
               />
             )}
 
-            <div className="flex items-start justify-between mb-4">
-              <h3 className="text-xl">{project.title[language]}</h3>
+            <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
+              <h3 className="text-lg sm:text-xl">{project.title[language]}</h3>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleEdit(project)}
@@ -358,13 +357,15 @@ export default function Projects() {
               </div>
             </div>
 
-            <p className="text-white/60 mb-4">{project.description[language]}</p>
+            <p className="text-white/60 text-sm sm:text-base mb-4">
+              {project.description[language]}
+            </p>
 
             <div className="flex flex-wrap gap-2 mb-4">
               {project.techStack.map((tech, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-sm"
+                  className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs sm:text-sm"
                 >
                   {tech}
                 </span>
@@ -375,7 +376,7 @@ export default function Projects() {
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+              className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm sm:text-base"
             >
               View Project <ExternalLink className="w-4 h-4" />
             </a>

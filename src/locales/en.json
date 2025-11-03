@@ -19,6 +19,8 @@
   "projects": {
     "title": "PROJECTS",
     "live": "Check Live Site",
+    "prev": "Previous",
+    "next": "Next",
     "items": {
       "earth": {
         "title": "3D Solar System Planets to Explore",
@@ -72,10 +74,10 @@
     "sendMessage": "Send Message",
     "contactInfo": "Info",
     "socials": "Socials",
-    "name" : "Your Name",
-    "email": "Your Email",
-    "phone": "Your Phone",
-    "message": "Your Message",
+    "name" : "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
     "submit": "Submit"
   }
 }

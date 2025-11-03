@@ -18,7 +18,8 @@
   },
   "projects": {
     "title": "LOYIHALAR",
-    "live": "Saytni ko‘rish",
+    "live": "Saytni ko‘rish","prev": "Oldingi",
+    "next": "Keyingi",
     "items": {
       "earth": {
         "title": "3D Quyosh tizimi sayyoralarini o‘rganing",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Globe } from "lucide-react";
+import { Plus, Edit2, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -40,18 +40,11 @@ export default function ExperienceManagement() {
   ];
 
   const [experiences, setExperiences] = useState(initialExperiences);
-
-  // Dialog va form holati
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-
-  // Inputlar uchun til tablari
   const [formLang, setFormLang] = useState("uz");
-
-  // Dashboarddagi til switcher
   const [viewLang, setViewLang] = useState("uz");
 
-  // Ma’lumotlar
   const [company, setCompany] = useState({ uz: "", en: "", ru: "" });
   const [role, setRole] = useState({ uz: "", en: "", ru: "" });
   const [description, setDescription] = useState({ uz: "", en: "", ru: "" });
@@ -104,7 +97,6 @@ export default function ExperienceManagement() {
 
   const handleSave = (e) => {
     e.preventDefault();
-
     const newExp = {
       id: editingId || Date.now().toString(),
       company,
@@ -130,7 +122,6 @@ export default function ExperienceManagement() {
     if (!isDialogOpen) setEditingId(null);
   }, [isDialogOpen]);
 
-  // Language Switcher (View)
   const LanguageSwitcherView = () => (
     <div className="flex items-center gap-2 border border-white/10 rounded-xl p-1 bg-white/5">
       {["uz", "en", "ru"].map((lang) => (
@@ -150,37 +141,39 @@ export default function ExperienceManagement() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-3xl mb-2">Experience Management</h2>
-          <p className="text-white/60">Manage multilingual work experiences</p>
+          <h2 className="text-2xl sm:text-3xl mb-2">Experience Management</h2>
+          <p className="text-white/60 text-sm sm:text-base">
+            Manage work experiences
+          </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-end w-full sm:w-auto">
           <LanguageSwitcherView />
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
                 onClick={openNew}
-                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Experience
               </Button>
             </DialogTrigger>
 
-            <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-2xl">
+            {/* RESPONSIVE DIALOG */}
+            <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-lg sm:max-w-2xl w-[90vw] max-h-[90vh] overflow-y-auto rounded-xl">
               <DialogHeader>
                 <DialogTitle>
                   {editingId ? "Edit Experience" : "Add New Experience"}
                 </DialogTitle>
               </DialogHeader>
 
-              {/* Language tabs for input form */}
-              <div className="flex gap-2 mb-4">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {["uz", "en", "ru"].map((lang) => (
                   <button
                     key={lang}
@@ -196,7 +189,6 @@ export default function ExperienceManagement() {
                 ))}
               </div>
 
-              {/* Form */}
               <form onSubmit={handleSave} className="space-y-4">
                 <div>
                   <Label>Company Name ({formLang.toUpperCase()})</Label>
@@ -238,7 +230,7 @@ export default function ExperienceManagement() {
                 {/* Logo Upload */}
                 <div>
                   <Label>Company Logo</Label>
-                  <div className="mt-2 flex items-center gap-4">
+                  <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     {logo ? (
                       <img
                         src={logo}
@@ -250,21 +242,21 @@ export default function ExperienceManagement() {
                         No Logo
                       </div>
                     )}
-                    <label className="cursor-pointer">
+                    <label className="cursor-pointer w-full sm:w-auto">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleLogoUpload}
                         className="hidden"
                       />
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                      <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
                         Upload
                       </div>
                     </label>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label>Start Date</Label>
                     <Input
@@ -294,21 +286,23 @@ export default function ExperienceManagement() {
                     onChange={(e) => setCurrent(e.target.checked)}
                     className="w-4 h-4"
                   />
-                  <Label className="cursor-pointer">Currently working here</Label>
+                  <Label className="cursor-pointer text-sm sm:text-base">
+                    Currently working here
+                  </Label>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-4">
+                <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setIsDialogOpen(false)}
-                    className="border-white/10"
+                    className="border-white/10 w-full sm:w-auto"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-gradient-to-r from-purple-500 to-blue-500"
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 w-full sm:w-auto"
                   >
                     Save Experience
                   </Button>
@@ -320,33 +314,31 @@ export default function ExperienceManagement() {
       </div>
 
       {/* Timeline */}
-      <div className="relative">
-        <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-blue-500" />
+      <div className="relative mt-6">
+        <div className="absolute left-6 sm:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-blue-500" />
 
         <div className="space-y-8">
           {experiences.map((exp) => (
-            <div key={exp.id} className="relative pl-20">
-              <div className="absolute left-6 top-6 w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 border-4 border-[#0a0a1a]" />
+            <div key={exp.id} className="relative pl-16 sm:pl-20">
+              <div className="absolute left-4 sm:left-6 top-6 w-4 sm:w-5 h-4 sm:h-5 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 border-4 border-[#0a0a1a]" />
 
-              <div className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      {exp.logo && (
-                        <img
-                          src={exp.logo}
-                          alt="logo"
-                          className="w-12 h-12 rounded-md bg-white/5 p-1 object-contain"
-                        />
-                      )}
-                      <div>
-                        <h3 className="text-xl mb-1">
-                          {exp.role[viewLang] || exp.role.en}
-                        </h3>
-                        <p className="text-white/60">
-                          {exp.company[viewLang] || exp.company.en}
-                        </p>
-                      </div>
+              <div className="rounded-2xl p-4 sm:p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all">
+                <div className="flex flex-wrap items-start justify-between mb-3">
+                  <div className="flex items-start gap-3 mb-2 sm:mb-0 w-full sm:w-auto">
+                    {exp.logo && (
+                      <img
+                        src={exp.logo}
+                        alt="logo"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-md bg-white/5 p-1 object-contain"
+                      />
+                    )}
+                    <div>
+                      <h3 className="text-lg sm:text-xl mb-1">
+                        {exp.role[viewLang] || exp.role.en}
+                      </h3>
+                      <p className="text-white/60 text-sm sm:text-base">
+                        {exp.company[viewLang] || exp.company.en}
+                      </p>
                     </div>
                   </div>
 
@@ -366,11 +358,11 @@ export default function ExperienceManagement() {
                   </div>
                 </div>
 
-                <p className="text-white/70 mb-4">
+                <p className="text-white/70 text-sm sm:text-base mb-4">
                   {exp.description[viewLang] || exp.description.en}
                 </p>
 
-                <p className="text-sm text-white/50">
+                <p className="text-xs sm:text-sm text-white/50">
                   {new Date(exp.startDate).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "short",

@@ -1,4 +1,4 @@
-import { Moon, Sun, Globe, Lock, User } from 'lucide-react'
+import { Moon, Sun, Globe, Lock } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
@@ -10,21 +10,23 @@ export default function SettingsPanel() {
   const [username, setUsername] = useState('admin_user')
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl mb-2">Settings</h2>
-        <p className="text-white/60">Manage your admin panel preferences</p>
+    <div className="space-y-8 px-4 sm:px-6 lg:px-8 pb-8">
+      {/* Header */}
+      <div className="text-center sm:text-left">
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-2">Settings</h2>
+        <p className="text-white/60 text-sm sm:text-base">Manage your admin panel preferences</p>
       </div>
 
+      {/* Theme & Language Settings */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Theme Settings - Simplified */}
-        <div className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 space-y-6">
+        {/* Theme Settings */}
+        <div className="rounded-2xl p-5 sm:p-6 bg-white/5 backdrop-blur-lg border border-white/10 space-y-6">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600">
               {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
             </div>
             <div>
-              <h3>Theme Mode</h3>
+              <h3 className="font-medium text-lg">Theme Mode</h3>
               <p className="text-sm text-white/60">Choose Light or Dark</p>
             </div>
           </div>
@@ -56,13 +58,13 @@ export default function SettingsPanel() {
         </div>
 
         {/* Language Settings */}
-        <div className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 space-y-6">
+        <div className="rounded-2xl p-5 sm:p-6 bg-white/5 backdrop-blur-lg border border-white/10 space-y-6">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600">
               <Globe className="w-5 h-5" />
             </div>
             <div>
-              <h3>Language</h3>
+              <h3 className="font-medium text-lg">Language</h3>
               <p className="text-sm text-white/60">Select content language</p>
             </div>
           </div>
@@ -98,18 +100,18 @@ export default function SettingsPanel() {
       </div>
 
       {/* Security Settings */}
-      <div className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 space-y-6">
+      <div className="rounded-2xl p-5 sm:p-6 bg-white/5 backdrop-blur-lg border border-white/10 space-y-6">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600">
             <Lock className="w-5 h-5" />
           </div>
           <div>
-            <h3>Security</h3>
+            <h3 className="font-medium text-lg">Security</h3>
             <p className="text-sm text-white/60">Update your username and password</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="username">Username</Label>
             <Input
@@ -152,9 +154,11 @@ export default function SettingsPanel() {
           </div>
         </div>
 
-        <Button className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700">
-          Save Changes
-        </Button>
+        <div className="flex justify-end">
+          <Button className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 w-full sm:w-auto">
+            Save Changes
+          </Button>
+        </div>
       </div>
     </div>
   )

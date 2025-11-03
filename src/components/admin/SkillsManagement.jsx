@@ -74,7 +74,7 @@ export default function SkillsManagement() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-3xl mb-2">Skills & Technologies</h2>
           <p className="text-white/60">Manage your technical skills</p>
@@ -89,13 +89,13 @@ export default function SkillsManagement() {
                 setPreview(null);
                 setIsDialogOpen(true);
               }}
-              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Skill
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-[#0a0a1a] border-white/10 text-white">
+          <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-md w-full">
             <DialogHeader>
               <DialogTitle>
                 {editingSkill ? "Edit Skill" : "Add New Skill"}
@@ -118,14 +118,14 @@ export default function SkillsManagement() {
               {/* Icon Upload */}
               <div>
                 <Label htmlFor="icon">Skill Icon</Label>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <Input
                     id="icon"
                     name="icon"
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="bg-white/5 border-white/10"
+                    className="bg-white/5 border-white/10 flex-1"
                   />
                   <Upload className="w-5 h-5 text-white/70" />
                 </div>
@@ -138,7 +138,7 @@ export default function SkillsManagement() {
                 )}
               </div>
 
-              <div className="flex justify-end gap-2 pt-4">
+              <div className="flex justify-end gap-2 pt-4 flex-wrap">
                 <Button
                   type="button"
                   variant="outline"
@@ -170,6 +170,7 @@ export default function SkillsManagement() {
             key={skill.id}
             className="group relative rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all"
           >
+            {/* Action buttons */}
             <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => openEditDialog(skill)}
@@ -185,7 +186,8 @@ export default function SkillsManagement() {
               </button>
             </div>
 
-            <div className="flex flex-col items-center gap-3">
+            {/* Skill card */}
+            <div className="flex flex-col items-center gap-3 text-center">
               <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
                 {skill.iconUrl ? (
                   <img
@@ -197,7 +199,7 @@ export default function SkillsManagement() {
                   <span className="text-2xl">⚙️</span>
                 )}
               </div>
-              <span className="text-center text-sm">{skill.name}</span>
+              <span className="text-sm break-words">{skill.name}</span>
             </div>
           </div>
         ))}

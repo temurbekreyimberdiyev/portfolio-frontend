@@ -57,32 +57,35 @@ const analyticsData = [
 
 export default function Dashboard() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-4 sm:px-6 lg:px-8">
+      {/* Header */}
       <div>
-        <h2 className="text-3xl mb-2">Dashboard Overview</h2>
-        <p className="text-white/60">
+        <h2 className="text-2xl sm:text-3xl mb-2 font-semibold">
+          Dashboard Overview
+        </h2>
+        <p className="text-white/60 text-sm sm:text-base">
           Welcome back! Here's what's happening with your portfolio.
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
             <div
               key={stat.label}
-              className="relative overflow-hidden rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all"
+              className="relative overflow-hidden rounded-2xl p-5 sm:p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-white/60 mb-1">{stat.label}</p>
-                  <p className="text-3xl">{stat.value}</p>
+                  <p className="text-white/60 mb-1 text-sm sm:text-base">{stat.label}</p>
+                  <p className="text-2xl sm:text-3xl font-semibold">{stat.value}</p>
                 </div>
                 <div
-                  className={`p-3 rounded-xl bg-gradient-to-br ${stat.color}`}
+                  className={`p-3 sm:p-4 rounded-xl bg-gradient-to-br ${stat.color}`}
                 >
-                  <Icon className="w-6 h-6" />
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
               </div>
             </div>
@@ -91,20 +94,23 @@ export default function Dashboard() {
       </div>
 
       {/* Analytics Chart */}
-      <div className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10">
-        <h3 className="text-xl mb-6">Visitor Analytics</h3>
-        <div className="h-80">
+      <div className="rounded-2xl p-4 sm:p-6 bg-white/5 backdrop-blur-lg border border-white/10">
+        <h3 className="text-lg sm:text-xl mb-4 sm:mb-6 font-medium">
+          Visitor Analytics
+        </h3>
+        <div className="h-64 sm:h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={analyticsData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(255,255,255,0.1)"
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis
                 dataKey="month"
                 stroke="rgba(255,255,255,0.5)"
+                tick={{ fontSize: 12 }}
               />
-              <YAxis stroke="rgba(255,255,255,0.5)" />
+              <YAxis
+                stroke="rgba(255,255,255,0.5)"
+                tick={{ fontSize: 12 }}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "rgba(10, 10, 26, 0.9)",
@@ -121,13 +127,7 @@ export default function Dashboard() {
                 activeDot={{ r: 6 }}
               />
               <defs>
-                <linearGradient
-                  id="colorGradient"
-                  x1="0"
-                  y1="0"
-                  x2="1"
-                  y2="0"
-                >
+                <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#8b5cf6" />
                   <stop offset="100%" stopColor="#06b6d4" />
                 </linearGradient>
