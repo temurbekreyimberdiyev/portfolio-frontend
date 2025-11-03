@@ -1,0 +1,18 @@
+{
+  "settings": "Settings",
+  "manage_preferences": "Manage your admin preferences",
+  "theme_mode": "Theme Mode",
+  "choose_light_dark": "Choose between light and dark mode",
+  "light": "Light",
+  "dark": "Dark",
+  "language": "Language",
+  "select_language": "Select your preferred language",
+  "security": "Security",
+  "update_credentials": "Update your login credentials",
+  "username": "Username",
+  "enter_new_username": "Enter new username",
+  "current_password": "Current password",
+  "new_password": "New password",
+  "confirm_password": "Confirm password",
+  "save_changes": "Save changes"
+}

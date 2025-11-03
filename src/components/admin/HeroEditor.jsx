@@ -1,30 +1,48 @@
 import { useState, useEffect } from "react";
-import { Upload, Trash2, Eye } from "lucide-react";
+import { Upload, Trash2, Eye, Globe } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import exampleAvatar from "../../assets/avatar.png";
 
 export default function HeroEditor() {
+  const [language, setLanguage] = useState("en");
   const [avatarUrl, setAvatarUrl] = useState(exampleAvatar);
   const [cvFile, setCvFile] = useState(null);
-  const [intro, setIntro] = useState("I do code and");
-  const [introColorText, setIntroColorText] = useState("make content about it!");
-  const [description, setDescription] = useState(
-    "I am Temurbek Reyimberdiyev, a seasoned Full-Stack Software Engineer and IT Mentor with over 4 years of professional experience. I love mentoring aspiring developers and building modern, efficient, and cloud-driven software solutions."
-  );
+
+  const [texts, setTexts] = useState({
+    en: {
+      intro: "I do code and",
+      introColorText: "make content about it!",
+      description:
+        "I am Temurbek Reyimberdiyev, a seasoned Full-Stack Software Engineer and IT Mentor with over 4 years of professional experience. I love mentoring aspiring developers and building modern, efficient, and cloud-driven software solutions.",
+      buttonText: "Get in Touch",
+    },
+    uz: {
+      intro: "Men dasturlayman va",
+      introColorText: "bu haqida kontent tayyorlayman!",
+      description:
+        "Men Temurbek Reyimberdiyevman, 4 yildan ortiq tajribaga ega Full-Stack dasturchi va IT mentorman. Yosh dasturchilarni o‘qitish va zamonaviy dasturiy yechimlar yaratishni yaxshi ko‘raman.",
+      buttonText: "Bog‘lanish",
+    },
+    ru: {
+      intro: "Я программирую и",
+      introColorText: "создаю контент об этом!",
+      description:
+        "Я Темурбек Рейимбердиев — опытный Full-Stack разработчик и IT-наставник с более чем 4-летним опытом. Мне нравится обучать начинающих разработчиков и создавать современные программные решения.",
+      buttonText: "Связаться",
+    },
+  });
+
   const [showCvPreview, setShowCvPreview] = useState(false);
 
-  // localStorage dan ma'lumotlarni olish
   useEffect(() => {
     const savedData = localStorage.getItem("heroData");
     if (savedData) {
       const parsed = JSON.parse(savedData);
       setAvatarUrl(parsed.avatarUrl || exampleAvatar);
       setCvFile(parsed.cvFile || null);
-      setIntro(parsed.intro || "");
-      setIntroColorText(parsed.introColorText || "");
-      setDescription(parsed.description || "");
+      setTexts(parsed.texts || texts);
     }
   }, []);
 
@@ -44,7 +62,6 @@ export default function HeroEditor() {
       alert("Please upload a valid PDF file!");
       return;
     }
-
     const fileUrl = URL.createObjectURL(file);
     setCvFile({ name: file.name, url: fileUrl });
   };
@@ -52,29 +69,51 @@ export default function HeroEditor() {
   const handleCvDelete = () => setCvFile(null);
 
   const handleSave = () => {
-    const data = {
-      avatarUrl,
-      cvFile,
-      intro,
-      introColorText,
-      description,
-    };
+    const data = { avatarUrl, cvFile, texts };
     localStorage.setItem("heroData", JSON.stringify(data));
     alert("Hero section updated successfully!");
   };
 
+  const updateText = (field, value) => {
+    setTexts((prev) => ({
+      ...prev,
+      [language]: { ...prev[language], [field]: value },
+    }));
+  };
+
   return (
     <div className="space-y-6 text-white">
-      <div>
-        <h2 className="text-3xl mb-2">Hero Section Editor</h2>
-        <p className="text-white/60">Customize your hero section content</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl mb-2">Hero Section Editor</h2>
+          <p className="text-white/60">Customize your hero section content</p>
+        </div>
+
+        {/* LANGUAGE SWITCH */}
+        <div className="flex items-center gap-2">
+          <Globe className="w-5 h-5 text-white/70" />
+          {["uz", "en", "ru"].map((lang) => (
+            <Button
+              key={lang}
+              onClick={() => setLanguage(lang)}
+              variant={language === lang ? "default" : "outline"}
+              className={`uppercase ${
+                language === lang
+                  ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
+                  : "border-white/20 text-white/70"
+              }`}
+            >
+              {lang}
+            </Button>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* -------- EDITOR PANEL -------- */}
+        {/* LEFT PANEL */}
         <div className="space-y-6">
-          {/* Avatar Upload */}
-          <div className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10">
+          {/* Avatar */}
+          <div className="rounded-2xl p-6 bg-white/5 border border-white/10">
             <Label>Avatar Image</Label>
             <div className="mt-4 flex items-center gap-6">
               <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/20">
@@ -84,7 +123,7 @@ export default function HeroEditor() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="flex flex-col gap-2">
+              <div>
                 <label className="cursor-pointer">
                   <input
                     type="file"
@@ -101,8 +140,8 @@ export default function HeroEditor() {
             </div>
           </div>
 
-          {/* CV Upload */}
-          <div className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10">
+          {/* CV */}
+          <div className="rounded-2xl p-6 bg-white/5 border border-white/10">
             <Label>CV File</Label>
             <div className="mt-4 flex flex-col gap-3">
               {!cvFile ? (
@@ -144,34 +183,40 @@ export default function HeroEditor() {
             </div>
           </div>
 
-          {/* Text Inputs */}
-          <div className="rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 space-y-4">
+          {/* TEXT INPUTS */}
+          <div className="rounded-2xl p-6 bg-white/5 border border-white/10 space-y-4">
             <div>
-              <Label htmlFor="intro">Intro Text</Label>
+              <Label>Intro Text ({language.toUpperCase()})</Label>
               <Input
-                id="intro"
-                value={intro}
-                onChange={(e) => setIntro(e.target.value)}
+                value={texts[language].intro}
+                onChange={(e) => updateText("intro", e.target.value)}
                 className="bg-white/5 border-white/10 mt-2"
               />
             </div>
 
             <div>
-              <Label htmlFor="introColorText">Colored Intro Text</Label>
+              <Label>Colored Intro Text ({language.toUpperCase()})</Label>
               <Input
-                id="introColorText"
-                value={introColorText}
-                onChange={(e) => setIntroColorText(e.target.value)}
+                value={texts[language].introColorText}
+                onChange={(e) => updateText("introColorText", e.target.value)}
                 className="bg-white/5 border-white/10 mt-2"
               />
             </div>
 
             <div>
-              <Label htmlFor="description">Description Text</Label>
+              <Label>Description ({language.toUpperCase()})</Label>
               <Input
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={texts[language].description}
+                onChange={(e) => updateText("description", e.target.value)}
+                className="bg-white/5 border-white/10 mt-2"
+              />
+            </div>
+
+            <div>
+              <Label>Button Text ({language.toUpperCase()})</Label>
+              <Input
+                value={texts[language].buttonText}
+                onChange={(e) => updateText("buttonText", e.target.value)}
                 className="bg-white/5 border-white/10 mt-2"
               />
             </div>
@@ -185,9 +230,11 @@ export default function HeroEditor() {
           </div>
         </div>
 
-        {/* -------- PREVIEW PANEL -------- */}
-        <div className="rounded-2xl p-8 bg-white/5 backdrop-blur-lg border border-white/10">
-          <h3 className="text-lg mb-4 text-white/60">Preview</h3>
+        {/* RIGHT PANEL (PREVIEW) */}
+        <div className="rounded-2xl p-8 bg-white/5 border border-white/10">
+          <h3 className="text-lg mb-4 text-white/60">
+            Preview ({language.toUpperCase()})
+          </h3>
           <div className="text-center space-y-6">
             <div className="relative w-36 h-36 mx-auto rounded-full p-[3px] bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400">
               <img
@@ -198,16 +245,18 @@ export default function HeroEditor() {
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-4xl font-bold">{intro}</h1>
+              <h1 className="text-4xl font-bold">{texts[language].intro}</h1>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-                {introColorText}
+                {texts[language].introColorText}
               </h1>
-              <p className="max-w-xl mx-auto text-white/70">{description}</p>
+              <p className="max-w-xl mx-auto text-white/70">
+                {texts[language].description}
+              </p>
             </div>
 
             <div className="flex gap-3 justify-center">
               <Button className="bg-gradient-to-r from-purple-500 to-pink-500">
-                Get In Touch
+                {texts[language].buttonText}
               </Button>
               {cvFile && (
                 <a
@@ -226,9 +275,9 @@ export default function HeroEditor() {
         </div>
       </div>
 
-      {/* PDF Preview Modal */}
+      {/* PDF PREVIEW */}
       {showCvPreview && cvFile && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-neutral-900 rounded-xl w-11/12 md:w-3/4 h-[80vh] p-4 relative">
             <button
               onClick={() => setShowCvPreview(false)}

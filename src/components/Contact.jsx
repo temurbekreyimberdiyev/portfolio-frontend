@@ -19,7 +19,7 @@ const Contact = () => {
       className="
         w-full flex flex-col items-center 
         px-6 py-10 mt-10 sm:mt-20
-        text-gray-900 dark:text-white
+        text-white
         bg-black/30 dark:bg-black/70
         backdrop-blur-xl
         rounded-2xl shadow-2xl
@@ -47,7 +47,7 @@ const Contact = () => {
               className="w-full px-4 py-2 rounded-xl bg-white/20 
                 dark:bg-white/10 border border-white/30 
                 dark:border-gray-700/40 shadow-sm focus:outline-none 
-                focus:ring-2 focus:ring-purple-500 text-sm"
+                focus:ring-2 focus:ring-purple-500 text-sm text-white placeholder-gray-300"
             />
             <input
               type="email"
@@ -55,7 +55,7 @@ const Contact = () => {
               className="w-full px-4 py-2 rounded-xl bg-white/20 
                 dark:bg-white/10 border border-white/30 
                 dark:border-gray-700/40 shadow-sm focus:outline-none 
-                focus:ring-2 focus:ring-purple-500 text-sm"
+                focus:ring-2 focus:ring-purple-500 text-sm text-white placeholder-gray-300"
             />
             <input
               type="tel"
@@ -63,7 +63,7 @@ const Contact = () => {
               className="w-full px-4 py-2 rounded-xl bg-white/20 
                 dark:bg-white/10 border border-white/30 
                 dark:border-gray-700/40 shadow-sm focus:outline-none 
-                focus:ring-2 focus:ring-purple-500 text-sm"
+                focus:ring-2 focus:ring-purple-500 text-sm text-white placeholder-gray-300"
             />
             <textarea
               rows="4"
@@ -71,13 +71,19 @@ const Contact = () => {
               className="w-full px-4 py-2 rounded-xl bg-white/20 
                 dark:bg-white/10 border border-white/30 
                 dark:border-gray-700/40 shadow-sm focus:outline-none 
-                focus:ring-2 focus:ring-purple-500 text-sm resize-none"
+                focus:ring-2 focus:ring-purple-500 text-sm text-white placeholder-gray-300 resize-none"
             ></textarea>
+
+            {/* 🔘 MOSLASHUVCHAN YUBORISH TUGMASI */}
             <button
-              className="w-full py-2 rounded-xl bg-gradient-to-r 
-                from-purple-500 to-purple-700 hover:from-purple-600 
-                hover:to-purple-800 shadow-md font-semibold text-white 
-                transition-all duration-300"
+              className="
+                w-full py-2 rounded-xl 
+                font-semibold text-white shadow-md transition-all duration-300
+                bg-gradient-to-r from-[#a855f7] to-[#9333ea]
+                hover:from-[#b266f9] hover:to-[#7e22ce]
+                dark:from-[#a855f7]/30 dark:to-[#9333ea]/20
+                dark:hover:from-[#9333ea]/60 dark:hover:to-[#6b21a8]/40
+              "
             >
               {t("contact.submit")}
             </button>
@@ -94,23 +100,23 @@ const Contact = () => {
 
           <div className="space-y-4">
             <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/20 dark:bg-white/10 border border-white/30 shadow-md">
-              <FaPhoneAlt className="text-gray-200" />
-              <span className="text-sm">+998 95 969 21 12</span>
+              <FaPhoneAlt className="text-white" />
+              <span className="text-sm text-white">+998 95 969 21 12</span>
             </div>
 
             <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/20 dark:bg-white/10 border border-white/30 shadow-md">
-              <FaEnvelope className="text-gray-200" />
+              <FaEnvelope className="text-white" />
               <a
                 href="mailto:temurbekreymberdiyev@gmail.com"
-                className="text-sm font-semibold hover:underline"
+                className="text-sm font-semibold text-white hover:underline"
               >
                 temurbekreymberdiyev@gmail.com
               </a>
             </div>
 
             <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/20 dark:bg-white/10 border border-white/30 shadow-md">
-              <FaMapMarkerAlt className="text-gray-200" />
-              <span className="text-sm">{t("contact.location")}</span>
+              <FaMapMarkerAlt className="text-white" />
+              <span className="text-sm text-white">{t("contact.location")}</span>
             </div>
           </div>
         </div>
@@ -172,7 +178,7 @@ const Contact = () => {
       </div>
 
       <footer
-        className="mt-16 text-xs text-gray-200 dark:text-gray-400 
+        className="mt-16 text-xs text-gray-300 
           px-3 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-sm"
       >
         {t("contact.footer")}

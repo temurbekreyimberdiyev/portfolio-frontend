@@ -1,0 +1,18 @@
+{
+  "settings": "Sozlamalar",
+  "manage_preferences": "Admin sozlamalarini boshqarish",
+  "theme_mode": "Mavzu rejimi",
+  "choose_light_dark": "Yorug‘ yoki qorong‘u rejimni tanlang",
+  "light": "Yorug‘",
+  "dark": "Qorong‘u",
+  "language": "Til",
+  "select_language": "Afzal tilni tanlang",
+  "security": "Xavfsizlik",
+  "update_credentials": "Kirish ma’lumotlarini yangilash",
+  "username": "Foydalanuvchi nomi",
+  "enter_new_username": "Yangi foydalanuvchi nomini kiriting",
+  "current_password": "Joriy parol",
+  "new_password": "Yangi parol",
+  "confirm_password": "Parolni tasdiqlang",
+  "save_changes": "O‘zgarishlarni saqlash"
+}

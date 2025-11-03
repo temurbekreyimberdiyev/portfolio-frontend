@@ -1,0 +1,18 @@
+{
+  "settings": "Настройки",
+  "manage_preferences": "Управляйте настройками администратора",
+  "theme_mode": "Режим темы",
+  "choose_light_dark": "Выберите светлый или тёмный режим",
+  "light": "Светлая",
+  "dark": "Тёмная",
+  "language": "Язык",
+  "select_language": "Выберите предпочтительный язык",
+  "security": "Безопасность",
+  "update_credentials": "Обновите данные для входа",
+  "username": "Имя пользователя",
+  "enter_new_username": "Введите новое имя пользователя",
+  "current_password": "Текущий пароль",
+  "new_password": "Новый пароль",
+  "confirm_password": "Подтвердите пароль",
+  "save_changes": "Сохранить изменения"
+}
