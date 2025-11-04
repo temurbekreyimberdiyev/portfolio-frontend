@@ -1,14 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { FaGoogle, FaApple, FaFacebook } from "react-icons/fa";
 
-export default function ExperienceItem({ company, role, period, description }) {
+export default function ExperienceItem({ company, role, period, description, logo }) {
   const { t } = useTranslation();
-
-  const icons = {
-    Google: <FaGoogle className="text-[#ea4335]" />,
-    Apple: <FaApple className="text-gray-700 dark:text-gray-300" />,
-    Meta: <FaFacebook className="text-[#0a84ff]" />,
-  };
 
   return (
     <div
@@ -17,7 +10,15 @@ export default function ExperienceItem({ company, role, period, description }) {
       pb-6 mb-6 transition-colors duration-500"
     >
       <div className="flex items-start sm:items-center gap-4">
-        <div className="text-2xl">{icons[company]}</div>
+        {/* Dynamic company logo (backenddan) */}
+        {logo && (
+          <img
+            src={logo}
+            alt={company}
+            className="w-12 h-12 sm:w-14 sm:h-14 object-contain rounded-full border border-gray-200 dark:border-gray-700"
+          />
+        )}
+
         <div>
           <h3 className="font-semibold text-lg text-gray-800 dark:text-white">
             {role}{" "}
@@ -25,13 +26,15 @@ export default function ExperienceItem({ company, role, period, description }) {
               {t("experience.at")} {company}
             </span>
           </h3>
+
           <p className="mt-2 text-sm leading-relaxed max-w-2xl text-gray-600 dark:text-gray-400">
             {description}
           </p>
         </div>
       </div>
+
       <span className="mt-3 sm:mt-0 text-sm text-gray-600 dark:text-gray-400">
-        {t(period)}
+        {period}
       </span>
     </div>
   );

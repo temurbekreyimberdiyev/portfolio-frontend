@@ -8,11 +8,14 @@ import {
   Mail, 
   Settings, 
   Menu, 
-  X 
+  X, 
+  LogOut 
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ activeSection, setActiveSection }) {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -24,9 +27,18 @@ export default function Sidebar({ activeSection, setActiveSection }) {
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
+  const handleLogout = () => {
+    // Tokenlarni tozalash
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+
+    // Foydalanuvchini login sahifasiga yuborish
+    navigate("/login");
+  };
+
   return (
     <>
-      {/* Mobil tugma */}
+      {/* Mobil menyu tugmasi */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -41,43 +53,56 @@ export default function Sidebar({ activeSection, setActiveSection }) {
         className={`fixed md:static top-0 left-0 h-full md:h-auto w-64 p-6 border-r border-white/10 bg-transparent backdrop-blur-none transition-transform duration-300 z-40
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
-        <div className="sticky top-6">
-          {/* Logo */}
-          <div className="mb-8 pt-0 sm:pt-4 pb-6 border-b border-white/10">
-            <h1 className="text-2xl bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-              Portfolio Admin
-            </h1>
+        <div className="sticky top-6 flex flex-col justify-between h-[90vh]">
+          <div>
+            {/* Logo */}
+            <div className="mb-8 pt-0 sm:pt-4 pb-6 border-b border-white/10">
+              <h1 className="text-2xl bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                Portfolio Admin
+              </h1>
+            </div>
+
+            {/* Navigation */}
+            <nav className="space-y-2">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeSection === item.id;
+
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveSection(item.id);
+                      setIsOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                      isActive
+                        ? "bg-white/10 backdrop-blur-lg shadow-lg shadow-purple-500/20 text-white"
+                        : "hover:bg-white/5 backdrop-blur-sm text-white/70 hover:text-white"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
 
-          {/* Navigation */}
-          <nav className="space-y-2">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeSection === item.id;
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveSection(item.id);
-                    setIsOpen(false); // mobilda tanlanganda yopiladi
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                    isActive
-                      ? "bg-white/10 backdrop-blur-lg shadow-lg shadow-purple-500/20 text-white"
-                      : "hover:bg-white/5 backdrop-blur-sm text-white/70 hover:text-white"
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+          {/* Logout tugmasi */}
+          <div className="border-t border-white/10 pt-6 mt-6">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-400 font-semibold transition"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* Mobil fon (overlay) */}
+      {/* Mobil overlay */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}

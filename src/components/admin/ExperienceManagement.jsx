@@ -11,35 +11,10 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
+import axios from "axios";
 
 export default function ExperienceManagement() {
-  const initialExperiences = [
-    {
-      id: "1",
-      logo:
-        "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1NiIgaGVpZ2h0PSI1NiI+PHJlY3Qgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiBmaWxsPSIjMjI4OGZmIiByeD0iOCI+PC9yZWN0Pjwvc3ZnPg==",
-      company: {
-        uz: "Yetakchi kompaniya",
-        en: "Leading Company",
-        ru: "Ведущая компания",
-      },
-      role: {
-        uz: "Katta Frontend Dasturchi",
-        en: "Senior Frontend Developer",
-        ru: "Старший Frontend Разработчик",
-      },
-      description: {
-        uz: "Frontend jamoasini boshqarish, kengaytiriladigan yechimlarni yaratish",
-        en: "Leading frontend development team, architecting scalable solutions",
-        ru: "Руководство командой фронтенда, проектирование масштабируемых решений",
-      },
-      startDate: "2023-01",
-      endDate: "",
-      current: true,
-    },
-  ];
-
-  const [experiences, setExperiences] = useState(initialExperiences);
+  const [experiences, setExperiences] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formLang, setFormLang] = useState("uz");
@@ -52,6 +27,45 @@ export default function ExperienceManagement() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [current, setCurrent] = useState(false);
+
+  const API_URL = "http://127.0.0.1:8000/api/experiences/";
+
+  // Fetch experiences from backend
+  const fetchExperiences = async () => {
+    try {
+      const res = await axios.get(API_URL);
+      setExperiences(
+        res.data.map((exp) => ({
+          id: exp.id,
+          company: {
+            uz: exp.company_uz,
+            en: exp.company_en,
+            ru: exp.company_ru,
+          },
+          role: {
+            uz: exp.role_uz,
+            en: exp.role_en,
+            ru: exp.role_ru,
+          },
+          description: {
+            uz: exp.description_uz,
+            en: exp.description_en,
+            ru: exp.description_ru,
+          },
+          logo: exp.logo,
+          startDate: exp.start_date,
+          endDate: exp.end_date,
+          current: exp.current,
+        }))
+      );
+    } catch (err) {
+      console.error("Failed to fetch experiences:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchExperiences();
+  }, []);
 
   const openNew = () => {
     clearForm();
@@ -83,8 +97,13 @@ export default function ExperienceManagement() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id) => {
-    setExperiences((prev) => prev.filter((e) => e.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_URL}${id}/`);
+      setExperiences((prev) => prev.filter((e) => e.id !== id));
+    } catch (err) {
+      console.error("Failed to delete experience:", err);
+    }
   };
 
   const handleLogoUpload = (e) => {
@@ -95,32 +114,36 @@ export default function ExperienceManagement() {
     reader.readAsDataURL(file);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    const newExp = {
-      id: editingId || Date.now().toString(),
-      company,
-      role,
-      description,
-      logo,
-      startDate,
-      endDate: current ? "" : endDate,
-      current,
-    };
+    const payload = new FormData();
+    payload.append("company_uz", company.uz);
+    payload.append("company_en", company.en);
+    payload.append("company_ru", company.ru);
+    payload.append("role_uz", role.uz);
+    payload.append("role_en", role.en);
+    payload.append("role_ru", role.ru);
+    payload.append("description_uz", description.uz);
+    payload.append("description_en", description.en);
+    payload.append("description_ru", description.ru);
+    payload.append("start_date", startDate);
+    payload.append("end_date", current ? "" : endDate);
+    payload.append("current", current);
+    if (logo && logo instanceof File) payload.append("logo", logo);
 
-    if (editingId) {
-      setExperiences((prev) => prev.map((exp) => (exp.id === editingId ? newExp : exp)));
-    } else {
-      setExperiences((prev) => [newExp, ...prev]);
+    try {
+      if (editingId) {
+        await axios.put(`${API_URL}${editingId}/`, payload);
+      } else {
+        await axios.post(API_URL, payload);
+      }
+      fetchExperiences();
+      setIsDialogOpen(false);
+      clearForm();
+    } catch (err) {
+      console.error("Failed to save experience:", err);
     }
-
-    setIsDialogOpen(false);
-    clearForm();
   };
-
-  useEffect(() => {
-    if (!isDialogOpen) setEditingId(null);
-  }, [isDialogOpen]);
 
   const LanguageSwitcherView = () => (
     <div className="flex items-center gap-2 border border-white/10 rounded-xl p-1 bg-white/5">

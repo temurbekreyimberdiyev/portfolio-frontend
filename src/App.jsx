@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const [theme, setTheme] = useState("dark");
 
-  // LocalStorage’dan o‘qish
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "dark";
     setTheme(savedTheme);
     document.documentElement.classList.toggle("dark", savedTheme === "dark");
   }, []);
 
-  // Tema o‘zgartirish
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
@@ -24,11 +24,21 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Foydalanuvchi uchun Portfolio sahifa */}
+        {/* Portfolio sahifa */}
         <Route path="/" element={<Home toggleTheme={toggleTheme} theme={theme} />} />
 
-        {/* Admin panel sahifa */}
-        <Route path="/admin" element={<Admin />} />
+        {/* Login sahifa */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Admin panel Protected */}
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute>
+              <Admin toggleTheme={toggleTheme} theme={theme} />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

@@ -1,29 +1,20 @@
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
 import ExperienceItem from "./ExperienceItem";
 
 export default function Experience() {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const [experiences, setExperiences] = useState([]);
 
-  const experiences = [
-    {
-      company: "Google",
-      role: t("experience.items.google.role"),
-      period: t("experience.period.google"),
-      description: t("experience.items.google.description"),
-    },
-    {
-      company: "Apple",
-      role: t("experience.items.apple.role"),
-      period: t("experience.period.apple"),
-      description: t("experience.items.apple.description"),
-    },
-    {
-      company: "Meta",
-      role: t("experience.items.meta.role"),
-      period: t("experience.period.meta"),
-      description: t("experience.items.meta.description"),
-    },
-  ];
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/experiences/")
+      .then((res) => setExperiences(res.data))
+      .catch((err) => console.error("Experience API xato:", err));
+  }, []);
+
+  const lang = i18n.language || "uz";
 
   return (
     <section
@@ -47,6 +38,7 @@ export default function Experience() {
           opacity-60 pointer-events-none
         "
       />
+
       <h2
         className="
           relative text-center text-3xl font-bold mb-12 tracking-widest
@@ -57,9 +49,26 @@ export default function Experience() {
       </h2>
 
       <div className="relative max-w-4xl mx-auto z-10">
-        {experiences.map((exp, index) => (
-          <ExperienceItem key={index} {...exp} />
-        ))}
+        {experiences.length > 0 ? (
+          experiences.map((exp) => (
+            <ExperienceItem
+              key={exp.id}
+              company={exp[`company_${lang}`]}
+              role={exp[`role_${lang}`]}
+              description={exp[`description_${lang}`]}
+              logo={exp.logo}
+              period={
+                exp.current
+                  ? `${exp.start_date} - ${t("experience.present") || "Hozir"}`
+                  : `${exp.start_date} - ${exp.end_date}`
+              }
+            />
+          ))
+        ) : (
+          <p className="text-center text-gray-500 dark:text-gray-400">
+            {t("experience.no_data") || "Ma’lumot topilmadi."}
+          </p>
+        )}
       </div>
     </section>
   );

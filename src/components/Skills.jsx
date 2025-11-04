@@ -1,35 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useTranslation } from "react-i18next";
-import {
-  FaReact, FaNodeJs, FaGitAlt, FaSass
-} from "react-icons/fa";
-import {
-  SiJavascript, SiTypescript, SiNextdotjs, SiExpress, SiNestjs,
-  SiSocketdotio, SiPostgresql, SiMongodb, SiTailwindcss,
-  SiFigma, SiCypress, SiStorybook
-} from "react-icons/si";
 
 export default function Skills() {
   const { t } = useTranslation();
+  const [skills, setSkills] = useState([]);
 
-  const skills = [
-    { icon: <SiJavascript className="text-yellow-400" />, name: "Javascript" },
-    { icon: <SiTypescript className="text-blue-400" />, name: "Typescript" },
-    { icon: <FaReact className="text-cyan-400" />, name: "React" },
-    { icon: <SiNextdotjs className="text-gray-900 dark:text-white" />, name: "Next.js" },
-    { icon: <FaNodeJs className="text-green-500" />, name: "Node.js" },
-    { icon: <SiExpress className="text-gray-700 dark:text-gray-300" />, name: "Express.js" },
-    { icon: <SiNestjs className="text-red-500" />, name: "Nest.js" },
-    { icon: <SiSocketdotio className="text-gray-600 dark:text-gray-200" />, name: "Socket.io" },
-    { icon: <SiPostgresql className="text-sky-500" />, name: "PostgreSQL" },
-    { icon: <SiMongodb className="text-green-400" />, name: "MongoDB" },
-    { icon: <FaSass className="text-pink-400" />, name: "Sass/Scss" },
-    { icon: <SiTailwindcss className="text-sky-400" />, name: "Tailwindcss" },
-    { icon: <SiFigma className="text-purple-500" />, name: "Figma" },
-    { icon: <SiCypress className="text-gray-700 dark:text-gray-300" />, name: "Cypress" },
-    { icon: <SiStorybook className="text-pink-500" />, name: "Storybook" },
-    { icon: <FaGitAlt className="text-orange-500" />, name: "Git" },
-  ];
+  // Backenddan ma'lumot olish
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/skills/")
+      .then((res) => {
+        setSkills(res.data);
+      })
+      .catch((err) => {
+        console.error("Skills API xato:", err);
+      });
+  }, []);
 
   return (
     <section
@@ -59,22 +46,30 @@ export default function Skills() {
           {t("skills.description")}
         </p>
 
-        {/* Responsive grid */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-8">
-          {skills.map((skill, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center gap-2 hover:scale-110 transition-transform duration-200"
-            >
-              <div className="text-5xl drop-shadow-[0_1px_5px_rgba(255,255,255,0.4)]">
-                {skill.icon}
+        {/* Loading holati */}
+        {skills.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-400">{t("skills.loading") || "Loading..."}</p>
+        ) : (
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-8">
+            {skills.map((skill) => (
+              <div
+                key={skill.id}
+                className="flex flex-col items-center gap-2 hover:scale-110 transition-transform duration-200"
+              >
+                <div className="w-16 h-16 flex items-center justify-center">
+                  <img
+                    src={skill.icon}
+                    alt={skill.name}
+                    className="w-16 h-16 object-contain drop-shadow-[0_1px_5px_rgba(255,255,255,0.4)]"
+                  />
+                </div>
+                <span className="text-gray-700 dark:text-gray-300 text-sm transition-colors duration-500">
+                  {skill.name}
+                </span>
               </div>
-              <span className="text-gray-700 dark:text-gray-300 text-sm transition-colors duration-500">
-                {skill.name}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

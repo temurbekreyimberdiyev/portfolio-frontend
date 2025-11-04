@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Edit2, Trash2, ExternalLink, Upload } from "lucide-react";
 import {
   Dialog,
@@ -11,46 +11,12 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
+import API from "../../api/axios"; // Axios konfiguratsiyangiz
 
 const mockSkills = ["React", "Next.js", "Node.js", "MongoDB", "PostgreSQL", "TailwindCSS", "Docker"];
 
-const initialProjects = [
-  {
-    id: "1",
-    title: {
-      uz: "E-commerce Platforma",
-      en: "E-commerce Platform",
-      ru: "Платформа электронной торговли",
-    },
-    description: {
-      uz: "To‘liq funksional onlayn xarid platformasi to‘lov integratsiyasi bilan",
-      en: "Full-stack online shopping platform with cart and payment integration",
-      ru: "Полнофункциональная онлайн-платформа с корзиной и оплатой",
-    },
-    techStack: ["React", "Node.js", "MongoDB"],
-    link: "https://example.com",
-    image: null,
-  },
-  {
-    id: "2",
-    title: {
-      uz: "Vazifalar boshqaruv tizimi",
-      en: "Task Management App",
-      ru: "Приложение для управления задачами",
-    },
-    description: {
-      uz: "Jamoaviy vazifalarni boshqarish tizimi real vaqt yangilanishi bilan",
-      en: "Collaborative task management with real-time updates",
-      ru: "Совместное управление задачами с обновлениями в реальном времени",
-    },
-    techStack: ["Next.js", "PostgreSQL", "Prisma"],
-    link: "https://example.com",
-    image: null,
-  },
-];
-
 export default function Projects() {
-  const [projects, setProjects] = useState(initialProjects);
+  const [projects, setProjects] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
@@ -60,10 +26,39 @@ export default function Projects() {
   const [title, setTitle] = useState({ uz: "", en: "", ru: "" });
   const [description, setDescription] = useState({ uz: "", en: "", ru: "" });
 
-  const handleDelete = (id) => {
-    setProjects(projects.filter((p) => p.id !== id));
+  // --- FETCH PROJECTS FROM BACKEND ---
+  const fetchProjects = async () => {
+    try {
+      const res = await API.get("projects/");
+      const data = res.data.map((p) => ({
+        id: p.id,
+        title: { uz: p.title_uz, en: p.title_en, ru: p.title_ru },
+        description: { uz: p.description_uz, en: p.description_en, ru: p.description_ru },
+        techStack: p.skills.map((s) => s.name),
+        link: p.link,
+        image: p.image,
+      }));
+      setProjects(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  // --- DELETE PROJECT ---
+  const handleDelete = async (id) => {
+    try {
+      await API.delete(`projects/${id}/`);
+      setProjects(projects.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // --- EDIT PROJECT ---
   const handleEdit = (project) => {
     setEditingProject(project);
     setSelectedTech(project.techStack || []);
@@ -89,31 +84,57 @@ export default function Projects() {
     );
   };
 
-  const handleSave = (e) => {
+  // --- SAVE PROJECT (CREATE OR UPDATE) ---
+  const handleSave = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    const newProject = {
-      id: editingProject?.id || Date.now().toString(),
-      title,
-      description,
-      techStack: selectedTech,
-      link: formData.get("link"),
+    const payload = {
+      title_uz: title.uz,
+      title_en: title.en,
+      title_ru: title.ru,
+      description_uz: description.uz,
+      description_en: description.en,
+      description_ru: description.ru,
+      link: e.currentTarget.link.value,
+      skills: selectedTech,
       image: previewImage,
     };
 
-    if (editingProject) {
-      setProjects(projects.map((p) => (p.id === editingProject.id ? newProject : p)));
-    } else {
-      setProjects([...projects, newProject]);
-    }
+    try {
+      let res;
+      if (editingProject) {
+        res = await API.put(`projects/${editingProject.id}/`, payload);
+      } else {
+        res = await API.post("projects/", payload);
+      }
 
-    setIsDialogOpen(false);
-    setEditingProject(null);
-    setSelectedTech([]);
-    setPreviewImage(null);
-    setTitle({ uz: "", en: "", ru: "" });
-    setDescription({ uz: "", en: "", ru: "" });
+      const savedProject = {
+        id: res.data.id,
+        title: { uz: res.data.title_uz, en: res.data.title_en, ru: res.data.title_ru },
+        description: {
+          uz: res.data.description_uz,
+          en: res.data.description_en,
+          ru: res.data.description_ru,
+        },
+        techStack: res.data.skills.map((s) => s.name),
+        link: res.data.link,
+        image: res.data.image,
+      };
+
+      if (editingProject) {
+        setProjects(projects.map((p) => (p.id === editingProject.id ? savedProject : p)));
+      } else {
+        setProjects([...projects, savedProject]);
+      }
+
+      setIsDialogOpen(false);
+      setEditingProject(null);
+      setSelectedTech([]);
+      setPreviewImage(null);
+      setTitle({ uz: "", en: "", ru: "" });
+      setDescription({ uz: "", en: "", ru: "" });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const LanguageSwitcher = () => (
@@ -183,7 +204,6 @@ export default function Projects() {
               </Button>
             </DialogTrigger>
 
-            {/* MODAL — RESPONSIVE DESIGN */}
             <DialogContent className="bg-[#0a0a1a] border-white/10 text-white w-[95vw] sm:w-[90vw] md:w-[700px] max-h-[90vh] overflow-y-auto rounded-2xl p-4 sm:p-6">
               <DialogHeader>
                 <DialogTitle className="text-lg sm:text-xl text-center sm:text-left">
@@ -194,7 +214,6 @@ export default function Projects() {
               <FormLanguageSwitcher />
 
               <form onSubmit={handleSave} className="space-y-4">
-                {/* Title */}
                 <div>
                   <Label htmlFor={`title_${formLanguage}`}>
                     Title ({formLanguage.toUpperCase()})
@@ -210,7 +229,6 @@ export default function Projects() {
                   />
                 </div>
 
-                {/* Description */}
                 <div>
                   <Label htmlFor={`desc_${formLanguage}`}>
                     Description ({formLanguage.toUpperCase()})
@@ -229,7 +247,6 @@ export default function Projects() {
                   />
                 </div>
 
-                {/* Image Upload */}
                 <div>
                   <Label>Project Image</Label>
                   <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -259,7 +276,6 @@ export default function Projects() {
                   </div>
                 </div>
 
-                {/* Tech Stack */}
                 <div>
                   <Label>Tech Stack</Label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
@@ -284,7 +300,6 @@ export default function Projects() {
                   </div>
                 </div>
 
-                {/* Link */}
                 <div>
                   <Label htmlFor="link">Project Link</Label>
                   <Input
@@ -298,7 +313,6 @@ export default function Projects() {
                   />
                 </div>
 
-                {/* Buttons */}
                 <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
                   <Button
                     type="button"

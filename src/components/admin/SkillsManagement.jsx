@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Trash2, Upload, Pencil } from "lucide-react";
 import {
   Dialog,
@@ -10,21 +10,42 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-
-const initialSkills = [
-  { id: "1", name: "JavaScript", iconUrl: "/icons/js.png" },
-  { id: "2", name: "React", iconUrl: "/icons/react.png" },
-  { id: "3", name: "Node.js", iconUrl: "/icons/node.png" },
-];
+import axios from "axios";
 
 export default function SkillsManagement() {
-  const [skills, setSkills] = useState(initialSkills);
+  const [skills, setSkills] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState(null);
   const [preview, setPreview] = useState(null);
+  const API_URL = "http://127.0.0.1:8000/api/skills/";
 
-  const handleDelete = (id) => {
-    setSkills(skills.filter((s) => s.id !== id));
+  // Fetch skills from backend
+  const fetchSkills = async () => {
+    try {
+      const res = await axios.get(API_URL);
+      setSkills(
+        res.data.map((s) => ({
+          id: s.id,
+          name: s.name,
+          iconUrl: s.icon,
+        }))
+      );
+    } catch (err) {
+      console.error("Failed to fetch skills:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSkills();
+  }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_URL}${id}/`);
+      setSkills((prev) => prev.filter((s) => s.id !== id));
+    } catch (err) {
+      console.error("Failed to delete skill:", err);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -36,33 +57,29 @@ export default function SkillsManagement() {
     }
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name");
-
-    if (editingSkill) {
-      // Update existing skill
-      setSkills((prev) =>
-        prev.map((s) =>
-          s.id === editingSkill.id
-            ? { ...s, name, iconUrl: preview || s.iconUrl }
-            : s
-        )
-      );
-    } else {
-      // Add new skill
-      const newSkill = {
-        id: Date.now().toString(),
-        name,
-        iconUrl: preview,
-      };
-      setSkills([...skills, newSkill]);
+    const payload = new FormData();
+    payload.append("name", name);
+    if (e.target.icon.files[0]) {
+      payload.append("icon", e.target.icon.files[0]);
     }
 
-    setPreview(null);
-    setEditingSkill(null);
-    setIsDialogOpen(false);
+    try {
+      if (editingSkill) {
+        await axios.put(`${API_URL}${editingSkill.id}/`, payload);
+      } else {
+        await axios.post(API_URL, payload);
+      }
+      fetchSkills();
+      setEditingSkill(null);
+      setPreview(null);
+      setIsDialogOpen(false);
+    } catch (err) {
+      console.error("Failed to save skill:", err);
+    }
   };
 
   const openEditDialog = (skill) => {
@@ -170,7 +187,6 @@ export default function SkillsManagement() {
             key={skill.id}
             className="group relative rounded-2xl p-6 bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-all"
           >
-            {/* Action buttons */}
             <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => openEditDialog(skill)}
@@ -186,7 +202,6 @@ export default function SkillsManagement() {
               </button>
             </div>
 
-            {/* Skill card */}
             <div className="flex flex-col items-center gap-3 text-center">
               <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
                 {skill.iconUrl ? (

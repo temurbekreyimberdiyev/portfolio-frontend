@@ -3,6 +3,7 @@ import { Upload, Trash2, Eye, Globe } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import axios from "axios";
 import exampleAvatar from "../../assets/avatar.png";
 
 export default function HeroEditor() {
@@ -12,37 +13,47 @@ export default function HeroEditor() {
   const [showCvPreview, setShowCvPreview] = useState(false);
 
   const [texts, setTexts] = useState({
-    en: {
-      intro: "I do code and",
-      introColorText: "make content about it!",
-      description:
-        "I am Temurbek Reyimberdiyev, a seasoned Full-Stack Software Engineer and IT Mentor with over 4 years of professional experience. I love mentoring aspiring developers and building modern, efficient, and cloud-driven software solutions.",
-      buttonText: "Get in Touch",
-    },
-    uz: {
-      intro: "Men dasturlayman va",
-      introColorText: "bu haqida kontent tayyorlayman!",
-      description:
-        "Men Temurbek Reyimberdiyevman, 4 yildan ortiq tajribaga ega Full-Stack dasturchi va IT mentorman. Yosh dasturchilarni o‘qitish va zamonaviy dasturiy yechimlar yaratishni yaxshi ko‘raman.",
-      buttonText: "Bog‘lanish",
-    },
-    ru: {
-      intro: "Я программирую и",
-      introColorText: "создаю контент об этом!",
-      description:
-        "Я Темурбек Рейимбердиев — опытный Full-Stack разработчик и IT-наставник с более чем 4-летним опытом. Мне нравится обучать начинающих разработчиков и создавать современные программные решения.",
-      buttonText: "Связаться",
-    },
+    en: { intro: "", introColorText: "", description: "", buttonText: "Get in Touch" },
+    uz: { intro: "", introColorText: "", description: "", buttonText: "Bog‘lanish" },
+    ru: { intro: "", introColorText: "", description: "", buttonText: "Связаться" },
   });
 
-  useEffect(() => {
-    const savedData = localStorage.getItem("heroData");
-    if (savedData) {
-      const parsed = JSON.parse(savedData);
-      setAvatarUrl(parsed.avatarUrl || exampleAvatar);
-      setCvFile(parsed.cvFile || null);
-      setTexts(parsed.texts || texts);
+  const API_URL = "http://127.0.0.1:8000/api/hero/1/";
+
+  // Fetch hero data from backend
+  const fetchHeroData = async () => {
+    try {
+      const res = await axios.get(API_URL);
+      const data = res.data;
+      setAvatarUrl(data.avatar || exampleAvatar);
+      if (data.cv_file) setCvFile({ url: data.cv_file, name: data.cv_file.split("/").pop() });
+      setTexts({
+        en: {
+          intro: data.intro_en || "",
+          introColorText: data.introColorText_en || "",
+          description: data.description_en || "",
+          buttonText: "Get in Touch",
+        },
+        uz: {
+          intro: data.intro_uz || "",
+          introColorText: data.introColorText_uz || "",
+          description: data.description_uz || "",
+          buttonText: "Bog‘lanish",
+        },
+        ru: {
+          intro: data.intro_ru || "",
+          introColorText: data.introColorText_ru || "",
+          description: data.description_ru || "",
+          buttonText: "Связаться",
+        },
+      });
+    } catch (err) {
+      console.error("Failed to fetch hero data:", err);
     }
+  };
+
+  useEffect(() => {
+    fetchHeroData();
   }, []);
 
   const handleImageUpload = (e) => {
@@ -62,22 +73,54 @@ export default function HeroEditor() {
       return;
     }
     const fileUrl = URL.createObjectURL(file);
-    setCvFile({ name: file.name, url: fileUrl });
+    setCvFile({ name: file.name, file, url: fileUrl });
   };
 
   const handleCvDelete = () => setCvFile(null);
-
-  const handleSave = () => {
-    const data = { avatarUrl, cvFile, texts };
-    localStorage.setItem("heroData", JSON.stringify(data));
-    alert("Hero section updated successfully!");
-  };
 
   const updateText = (field, value) => {
     setTexts((prev) => ({
       ...prev,
       [language]: { ...prev[language], [field]: value },
     }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("intro_en", texts.en.intro);
+      formData.append("intro_uz", texts.uz.intro);
+      formData.append("intro_ru", texts.ru.intro);
+      formData.append("introColorText_en", texts.en.introColorText);
+      formData.append("introColorText_uz", texts.uz.introColorText);
+      formData.append("introColorText_ru", texts.ru.introColorText);
+      formData.append("description_en", texts.en.description);
+      formData.append("description_uz", texts.uz.description);
+      formData.append("description_ru", texts.ru.description);
+
+      if (avatarUrl && avatarUrl !== exampleAvatar) {
+        // Convert base64 to Blob if it's a new uploaded image
+        if (avatarUrl.startsWith("data:image")) {
+          const res = await fetch(avatarUrl);
+          const blob = await res.blob();
+          formData.append("avatar", blob, "avatar.png");
+        }
+      }
+
+      if (cvFile?.file) {
+        formData.append("cv_file", cvFile.file);
+      }
+
+      await axios.put(API_URL, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("Hero section updated successfully!");
+      fetchHeroData();
+    } catch (err) {
+      console.error("Failed to save hero data:", err);
+      alert("Failed to update hero section!");
+    }
   };
 
   return (
@@ -184,26 +227,22 @@ export default function HeroEditor() {
 
           {/* TEXT INPUTS */}
           <div className="rounded-2xl p-6 bg-white/5 border border-white/10 space-y-4">
-            {["intro", "introColorText", "description", "buttonText"].map(
-              (field) => (
-                <div key={field}>
-                  <Label>
-                    {field === "intro"
-                      ? `Intro Text (${language.toUpperCase()})`
-                      : field === "introColorText"
-                      ? `Colored Intro Text (${language.toUpperCase()})`
-                      : field === "description"
-                      ? `Description (${language.toUpperCase()})`
-                      : `Button Text (${language.toUpperCase()})`}
-                  </Label>
-                  <Input
-                    value={texts[language][field]}
-                    onChange={(e) => updateText(field, e.target.value)}
-                    className="bg-white/5 border-white/10 mt-2 text-sm sm:text-base"
-                  />
-                </div>
-              )
-            )}
+            {["intro", "introColorText", "description"].map((field) => (
+              <div key={field}>
+                <Label>
+                  {field === "intro"
+                    ? `Intro Text (${language.toUpperCase()})`
+                    : field === "introColorText"
+                    ? `Colored Intro Text (${language.toUpperCase()})`
+                    : `Description (${language.toUpperCase()})`}
+                </Label>
+                <Input
+                  value={texts[language][field]}
+                  onChange={(e) => updateText(field, e.target.value)}
+                  className="bg-white/5 border-white/10 mt-2 text-sm sm:text-base"
+                />
+              </div>
+            ))}
             <Button
               onClick={handleSave}
               className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-sm sm:text-base"
