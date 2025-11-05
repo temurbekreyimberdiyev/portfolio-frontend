@@ -47,7 +47,7 @@ export default function Contact() {
   if (!contactInfo) return null;
 
   return (
-    <div className="w-full flex flex-col items-center px-6 py-10 mt-10 sm:mt-20 text-white bg-black/30 dark:bg-black/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/40 transition-colors duration-500">
+    <div name="contact" className="w-full flex flex-col items-center px-6 py-10 mt-10 sm:mt-20 text-white bg-black/30 dark:bg-black/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/40 transition-colors duration-500">
 
       <h1 className="text-3xl font-bold mb-10 drop-shadow-md">{t("contact.title")}</h1>
 

@@ -376,9 +376,9 @@ export default function SettingsPanel() {
                 className="absolute right-3 top-10 text-white/50 hover:text-white/80 transition"
               >
                 {showNew ? (
-                  <EyeOff className="w-4 h-4" />
+                  <EyeOff className="text-black w-4 h-4" />
                 ) : (
-                  <Eye className="w-4 h-4" />
+                  <Eye className="text-black w-4 h-4" />
                 )}
               </button>
             </div>
@@ -400,9 +400,9 @@ export default function SettingsPanel() {
                 className="absolute right-3 top-10 text-white/50 hover:text-white/80 transition"
               >
                 {showConfirm ? (
-                  <EyeOff className="w-4 h-4" />
+                  <EyeOff className="text-black w-4 h-4" />
                 ) : (
-                  <Eye className="w-4 h-4" />
+                  <Eye className="text-black w-4 h-4" />
                 )}
               </button>
             </div>
