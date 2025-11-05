@@ -8,6 +8,24 @@ import { useTranslation } from "react-i18next";
 const getDefaultImage = () =>
   `https://source.unsplash.com/800x600/?project,technology,web,code,developer`;
 
+// 🔹 Linkni to‘liq URL qiluvchi funksiya
+const getFullLink = (link) => {
+  if (!link) return "#";
+
+  // Agar link "http" yoki "https" bilan boshlansa, uni o'zgartirmaymiz
+  if (link.startsWith("http://") || link.startsWith("https://")) {
+    return link;
+  }
+
+  // Agar link "www." bilan boshlansa, https:// qo'shamiz
+  if (link.startsWith("www.")) {
+    return `https://${link}`;
+  }
+
+  // Aks holda sizning default domainni qo'shamiz
+  return `https://example.com${link.startsWith("/") ? "" : "/"}${link}`;
+};
+
 export default function ProjectCard({ image, title, description, tech = [], link }) {
   const { t } = useTranslation();
 
@@ -57,13 +75,7 @@ export default function ProjectCard({ image, title, description, tech = [], link
         {/* Title + description */}
         <div>
           <h3 className="text-lg sm:text-xl font-semibold mb-2">{title}</h3>
-          <p
-            className="
-              text-gray-700 dark:text-gray-300 
-              text-sm sm:text-base 
-              mb-4 leading-relaxed
-            "
-          >
+          <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base mb-4 leading-relaxed">
             {description}
           </p>
         </div>
@@ -72,15 +84,13 @@ export default function ProjectCard({ image, title, description, tech = [], link
         <div className="flex items-center justify-between mt-auto">
           <div className="flex gap-3 text-lg sm:text-xl text-gray-600 dark:text-gray-300">
             {tech.includes("react") && <FaReact className="text-cyan-400" />}
-            {tech.includes("next") && (
-              <SiNextdotjs className="text-gray-900 dark:text-white" />
-            )}
+            {tech.includes("next") && <SiNextdotjs className="text-gray-900 dark:text-white" />}
             {tech.includes("ts") && <SiTypescript className="text-blue-400" />}
             {tech.includes("three") && <TbCube className="text-purple-400" />}
           </div>
 
           <a
-            href={link || "#"}
+            href={getFullLink(link)}
             target="_blank"
             rel="noopener noreferrer"
             className="

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Plus,
   Trash2,
@@ -23,52 +23,25 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
-const initialContactInfo = {
-  uz: { phone: "+998 90 123 45 67", email: "developer@example.com", address: "Toshkent, O‘zbekiston" },
-  en: { phone: "+998 90 123 45 67", email: "developer@example.com", address: "Tashkent, Uzbekistan" },
-  ru: { phone: "+998 90 123 45 67", email: "developer@example.com", address: "Ташкент, Узбекистан" },
-};
-
-const initialSocialLinks = {
-  uz: [
-    { id: "1", platform: "Telegram", url: "https://t.me/username", iconUrl: "/icons/telegram.png" },
-    { id: "2", platform: "Instagram", url: "https://instagram.com/username", iconUrl: "/icons/instagram.png" },
-  ],
-  en: [
-    { id: "1", platform: "Telegram", url: "https://t.me/username", iconUrl: "/icons/telegram.png" },
-    { id: "2", platform: "Instagram", url: "https://instagram.com/username", iconUrl: "/icons/instagram.png" },
-  ],
-  ru: [
-    { id: "1", platform: "Телеграм", url: "https://t.me/username", iconUrl: "/icons/telegram.png" },
-    { id: "2", platform: "Инстаграм", url: "https://instagram.com/username", iconUrl: "/icons/instagram.png" },
-  ],
-};
-
-const sampleMessages = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1234567890",
-    message: "Hi! I would like to discuss a project with you.",
-    date: "2025-10-15",
-    read: false,
-  },
-  {
-    id: "2",
-    name: "Sarah Smith",
-    email: "sarah@company.com",
-    phone: "+1987654321",
-    message: "We are looking for a developer for our startup. Are you available?",
-    date: "2025-10-12",
-    read: true,
-  },
-];
+// API URLs
+const API_BASE = "http://127.0.0.1:8000/api";
+const CONTACT_API = `${API_BASE}/contacts/`;
+const SOCIAL_API = `${API_BASE}/social/`;
+const MESSAGE_API = `${API_BASE}/messages/`;
 
 export default function ContactManagement() {
-  const [contactInfo, setContactInfo] = useState(initialContactInfo);
-  const [socialLinks, setSocialLinks] = useState(initialSocialLinks);
-  const [messages, setMessages] = useState(sampleMessages);
+  const [contactInfo, setContactInfo] = useState({
+    uz: { phone: "", email: "", address: "" },
+    en: { phone: "", email: "", address: "" },
+    ru: { phone: "", email: "", address: "" },
+  });
+  const [contactId, setContactId] = useState(null); // Yangi: bitta yozuv ID
+  const [socialLinks, setSocialLinks] = useState({
+    uz: [],
+    en: [],
+    ru: [],
+  });
+  const [messages, setMessages] = useState([]);
   const [currentLang, setCurrentLang] = useState("uz");
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -77,15 +50,147 @@ export default function ContactManagement() {
   const [editPreview, setEditPreview] = useState(null);
   const [editingLink, setEditingLink] = useState(null);
 
+  const [loading, setLoading] = useState(true);
+
+  // === FETCH DATA ON MOUNT ===
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // === Fetch Contacts (bitta yozuv) ===
+        const contactRes = await fetch(CONTACT_API);
+        const contacts = await contactRes.json();
+        const contact = contacts.find((c) => c.lang === "uz") || contacts[0];
+
+        if (contact) {
+          setContactId(contact.id);
+          setContactInfo({
+            uz: {
+              phone: contact.phone || "",
+              email: contact.email || "",
+              address: contact.address_uz || "",
+            },
+            en: {
+              phone: contact.phone || "",
+              email: contact.email || "",
+              address: contact.address_en || "",
+            },
+            ru: {
+              phone: contact.phone || "",
+              email: contact.email || "",
+              address: contact.address_ru || "",
+            },
+          });
+        }
+
+        // === Fetch Social Links ===
+        const socialRes = await fetch(SOCIAL_API);
+        const socials = await socialRes.json();
+        const newSocialLinks = { uz: [], en: [], ru: [] };
+        socials.forEach((s) => {
+          newSocialLinks.uz.push({
+            id: s.id.toString(),
+            platform: s.platform_uz,
+            url: s.url,
+            iconUrl: s.icon,
+          });
+          newSocialLinks.en.push({
+            id: s.id.toString(),
+            platform: s.platform_en,
+            url: s.url,
+            iconUrl: s.icon,
+          });
+          newSocialLinks.ru.push({
+            id: s.id.toString(),
+            platform: s.platform_ru,
+            url: s.url,
+            iconUrl: s.icon,
+          });
+        });
+        setSocialLinks(newSocialLinks);
+
+        // === Fetch Messages ===
+        const msgRes = await fetch(MESSAGE_API);
+        const msgs = await msgRes.json();
+        setMessages(
+          msgs.map((m) => ({
+            id: m.id.toString(),
+            name: m.name,
+            email: m.email,
+            phone: m.phone,
+            message: m.message,
+            date: m.date,
+            read: m.read,
+          }))
+        );
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // === HANDLERS ===
   const handleLangSwitch = (lang) => setCurrentLang(lang);
-  const toggleRead = (id) => setMessages((prev) => prev.map((msg) => (msg.id === id ? { ...msg, read: !msg.read } : msg)));
-  const deleteMessage = (id) => setMessages((prev) => prev.filter((msg) => msg.id !== id));
-  const handleUpdateContact = (field, value) => {
-    setContactInfo({
+
+  const toggleRead = async (id) => {
+    const msg = messages.find((m) => m.id === id);
+    const updated = { ...msg, read: !msg.read };
+
+    try {
+      await fetch(`${MESSAGE_API}${id}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ read: updated.read }),
+      });
+      setMessages((prev) => prev.map((m) => (m.id === id ? updated : m)));
+    } catch (err) {
+      console.error("Failed to update read status:", err);
+    }
+  };
+
+  const deleteMessage = async (id) => {
+    try {
+      await fetch(`${MESSAGE_API}${id}/`, { method: "DELETE" });
+      setMessages((prev) => prev.filter((m) => m.id !== id));
+    } catch (err) {
+      console.error("Failed to delete message:", err);
+    }
+  };
+
+  // Tuzatilgan: bitta yozuv, payload faqat kerakli maydon
+  const handleUpdateContact = async (field, value) => {
+    const updated = {
       ...contactInfo,
       [currentLang]: { ...contactInfo[currentLang], [field]: value },
-    });
+    };
+    setContactInfo(updated);
+
+    if (!contactId) return;
+
+    const payload = {};
+
+    if (field === "phone" || field === "email") {
+      payload[field] = value;
+    } else if (field === "address") {
+      payload[`address_${currentLang}`] = value;
+    }
+
+    try {
+      await fetch(`${CONTACT_API}${contactId}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error("Failed to save contact:", err);
+    }
   };
+
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -94,6 +199,7 @@ export default function ContactManagement() {
       reader.readAsDataURL(file);
     }
   };
+
   const handleEditFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -102,12 +208,29 @@ export default function ContactManagement() {
       reader.readAsDataURL(file);
     }
   };
-  const handleDeleteSocial = (id) => {
-    setSocialLinks({
-      ...socialLinks,
-      [currentLang]: socialLinks[currentLang].filter((s) => s.id !== id),
-    });
+
+  const handleDeleteSocial = async (id) => {
+    try {
+      await fetch(`${SOCIAL_API}${id}/`, { method: "DELETE" });
+      setSocialLinks((prev) => ({
+        ...prev,
+        uz: prev.uz.filter((s) => s.id !== id),
+        en: prev.en.filter((s) => s.id !== id),
+        ru: prev.ru.filter((s) => s.id !== id),
+      }));
+    } catch (err) {
+      console.error("Failed to delete social link:", err);
+    }
   };
+
+  // === RENDER ===
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-white/60">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 text-white">
@@ -154,15 +277,15 @@ export default function ContactManagement() {
                     {field === "email" && <Mail className="w-5 h-5 text-white/40" />}
                     {field === "address" && <MapPin className="w-5 h-5 text-white/40" />}
                     <Input
-                      value={contactInfo[currentLang][field]}
+                      value={contactInfo[currentLang][field] || ""}
                       onChange={(e) => handleUpdateContact(field, e.target.value)}
                       className="bg-white/5 border-white/10 flex-1"
                     />
                   </div>
                 </div>
               ))}
-              <Button className="w-full bg-gradient-to-r from-purple-500 to-blue-500">
-                Save Contact Info
+              <Button className="w-full bg-gradient-to-r from-purple-500 to-blue-500" disabled>
+                Saved Automatically
               </Button>
             </div>
 
@@ -173,13 +296,13 @@ export default function ContactManagement() {
               </h3>
               <div className="space-y-4 text-center lg:text-left">
                 <div className="flex items-center justify-center lg:justify-start gap-3 text-white/80">
-                  <Phone className="w-5 h-5" /> {contactInfo[currentLang].phone}
+                  <Phone className="w-5 h-5" /> {contactInfo[currentLang].phone || "—"}
                 </div>
                 <div className="flex items-center justify-center lg:justify-start gap-3 text-white/80">
-                  <Mail className="w-5 h-5" /> {contactInfo[currentLang].email}
+                  <Mail className="w-5 h-5" /> {contactInfo[currentLang].email || "—"}
                 </div>
                 <div className="flex items-center justify-center lg:justify-start gap-3 text-white/80">
-                  <MapPin className="w-5 h-5" /> {contactInfo[currentLang].address}
+                  <MapPin className="w-5 h-5" /> {contactInfo[currentLang].address || "—"}
                 </div>
               </div>
             </div>
@@ -213,21 +336,46 @@ export default function ContactManagement() {
                   {["uz", "en", "ru"].map((lang) => (
                     <TabsContent key={lang} value={lang}>
                       <form
-                        onSubmit={(e) => {
+                        onSubmit={async (e) => {
                           e.preventDefault();
                           const formData = new FormData(e.currentTarget);
-                          const newLink = {
-                            id: Date.now().toString(),
-                            platform: formData.get("platform"),
-                            url: formData.get("url"),
-                            iconUrl: preview,
-                          };
-                          setSocialLinks((prev) => ({
-                            ...prev,
-                            [lang]: [...prev[lang], newLink],
-                          }));
-                          setIsDialogOpen(false);
-                          setPreview(null);
+                          const file = formData.get("icon");
+
+                          const payload = new FormData();
+                          payload.append("platform_uz", lang === "uz" ? formData.get("platform") : "");
+                          payload.append("platform_en", lang === "en" ? formData.get("platform") : "");
+                          payload.append("platform_ru", lang === "ru" ? formData.get("platform") : "");
+                          payload.append("url", formData.get("url"));
+                          if (file) payload.append("icon", file);
+
+                          try {
+                            const res = await fetch(SOCIAL_API, {
+                              method: "POST",
+                              body: payload,
+                            });
+                            const newLink = await res.json();
+
+                            const linkObj = {
+                              id: newLink.id.toString(),
+                              platform:
+                                lang === "uz"
+                                  ? newLink.platform_uz
+                                  : lang === "en"
+                                  ? newLink.platform_en
+                                  : newLink.platform_ru,
+                              url: newLink.url,
+                              iconUrl: newLink.icon,
+                            };
+
+                            setSocialLinks((prev) => ({
+                              ...prev,
+                              [lang]: [...prev[lang], linkObj],
+                            }));
+                            setIsDialogOpen(false);
+                            setPreview(null);
+                          } catch (err) {
+                            console.error("Failed to add social link:", err);
+                          }
                         }}
                         className="space-y-4"
                       >
@@ -241,7 +389,7 @@ export default function ContactManagement() {
                         </div>
                         <div>
                           <Label>Upload Icon</Label>
-                          <Input type="file" onChange={handleFileChange} accept="image/*" className="bg-white/5 border-white/10 w-full" />
+                          <Input type="file" name="icon" onChange={handleFileChange} accept="image/*" className="bg-white/5 border-white/10 w-full" />
                           {preview && <img src={preview} alt="Preview" className="mt-3 w-16 h-16 mx-auto sm:mx-0" />}
                         </div>
                         <div className="flex justify-end gap-2 flex-wrap">
@@ -259,7 +407,7 @@ export default function ContactManagement() {
               </DialogContent>
             </Dialog>
 
-            {/* 🔽 EDIT LINK DIALOG FORM QO‘SHILDI 🔽 */}
+            {/* EDIT DIALOG */}
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
               <DialogContent className="bg-[#0a0a1a] border-white/10 text-white w-[95%] sm:max-w-md">
                 <DialogHeader>
@@ -267,24 +415,49 @@ export default function ContactManagement() {
                 </DialogHeader>
                 {editingLink && (
                   <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                       e.preventDefault();
                       const formData = new FormData(e.currentTarget);
-                      const updatedLink = {
-                        ...editingLink,
-                        platform: formData.get("platform"),
-                        url: formData.get("url"),
-                        iconUrl: editPreview || editingLink.iconUrl,
-                      };
-                      setSocialLinks((prev) => ({
-                        ...prev,
-                        [currentLang]: prev[currentLang].map((link) =>
-                          link.id === editingLink.id ? updatedLink : link
-                        ),
-                      }));
-                      setIsEditDialogOpen(false);
-                      setEditingLink(null);
-                      setEditPreview(null);
+                      const file = formData.get("icon");
+
+                      const payload = new FormData();
+                      payload.append("platform_uz", currentLang === "uz" ? formData.get("platform") : editingLink.platform);
+                      payload.append("platform_en", currentLang === "en" ? formData.get("platform") : editingLink.platform);
+                      payload.append("platform_ru", currentLang === "ru" ? formData.get("platform") : editingLink.platform);
+                      payload.append("url", formData.get("url"));
+                      if (file) payload.append("icon", file);
+
+                      try {
+                        const res = await fetch(`${SOCIAL_API}${editingLink.id}/`, {
+                          method: "PATCH",
+                          body: payload,
+                        });
+                        const updated = await res.json();
+
+                        const updatedLink = {
+                          ...editingLink,
+                          platform:
+                            currentLang === "uz"
+                              ? updated.platform_uz
+                              : currentLang === "en"
+                              ? updated.platform_en
+                              : updated.platform_ru,
+                          url: updated.url,
+                          iconUrl: file ? URL.createObjectURL(file) : updated.icon,
+                        };
+
+                        setSocialLinks((prev) => ({
+                          ...prev,
+                          [currentLang]: prev[currentLang].map((link) =>
+                            link.id === editingLink.id ? updatedLink : link
+                          ),
+                        }));
+                        setIsEditDialogOpen(false);
+                        setEditingLink(null);
+                        setEditPreview(null);
+                      } catch (err) {
+                        console.error("Failed to update link:", err);
+                      }
                     }}
                     className="space-y-4"
                   >
@@ -311,6 +484,7 @@ export default function ContactManagement() {
                       <Label>Change Icon</Label>
                       <Input
                         type="file"
+                        name="icon"
                         onChange={handleEditFileChange}
                         accept="image/*"
                         className="bg-white/5 border-white/10 w-full"
@@ -335,7 +509,6 @@ export default function ContactManagement() {
                 )}
               </DialogContent>
             </Dialog>
-            {/* 🔼 TUGADI 🔼 */}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -344,7 +517,7 @@ export default function ContactManagement() {
                 <div className="flex items-start justify-between mb-3">
                   <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/10">
                     {link.iconUrl ? (
-                      <img src={link.iconUrl} className="w-6 h-6 object-contain" />
+                      <img src={link.iconUrl} alt={link.platform} className="w-6 h-6 object-contain" />
                     ) : (
                       <Globe className="w-5 h-5 text-white/60" />
                     )}

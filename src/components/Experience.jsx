@@ -48,28 +48,45 @@ export default function Experience() {
         {t("experience.title")}
       </h2>
 
-      <div className="relative max-w-4xl mx-auto z-10">
-        {experiences.length > 0 ? (
-          experiences.map((exp) => (
-            <ExperienceItem
-              key={exp.id}
-              company={exp[`company_${lang}`]}
-              role={exp[`role_${lang}`]}
-              description={exp[`description_${lang}`]}
-              logo={exp.logo}
-              period={
-                exp.current
-                  ? `${exp.start_date} - ${t("experience.present") || "Hozir"}`
-                  : `${exp.start_date} - ${exp.end_date}`
-              }
-            />
-          ))
-        ) : (
-          <p className="text-center text-gray-500 dark:text-gray-400">
-            {t("experience.no_data") || "Ma’lumot topilmadi."}
-          </p>
-        )}
+      <div className="relative max-w-4xl mx-auto z-10 space-y-6">
+  {experiences.length > 0 ? (
+    experiences.map((exp) => (
+      <div
+        key={exp.id}
+        className="p-6 bg-white/10 backdrop-blur-xl rounded-3xl shadow-xl border border-white/25 hover:scale-105 hover:shadow-2xl transition-transform duration-300"
+      >
+        <div className="flex items-center space-x-5">
+          <img
+            src={exp.logo}
+            alt={exp[`company_${lang}`]}
+            className="w-16 h-16 rounded-full object-cover border-2 border-white/30"
+          />
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              {exp[`company_${lang}`]}
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              {exp[`role_${lang}`]}
+            </p>
+          </div>
+        </div>
+        <p className="mt-4 text-gray-800 dark:text-gray-200">
+          {exp[`description_${lang}`]}
+        </p>
+        <span className="mt-3 inline-block text-sm text-gray-600 dark:text-gray-400">
+          {exp.current
+            ? `${exp.start_date} - ${t("experience.present") || "Hozir"}`
+            : `${exp.start_date} - ${exp.end_date}`}
+        </span>
       </div>
+    ))
+  ) : (
+    <p className="text-center text-gray-500 dark:text-gray-400">
+      {t("experience.no_data") || "Ma’lumot topilmadi."}
+    </p>
+  )}
+</div>
+
     </section>
   );
 }

@@ -42,6 +42,7 @@
   "experience": {
     "title": "TAJRIBA",
     "at": "da",
+    "present": "Hozirgacha",
     "period": {
       "google": "Noyabr 2019 – Hozirgacha",
       "apple": "Yanvar 2016 – Dekabr 2017",
@@ -69,7 +70,7 @@
     "instagram": "Instagram",
     "github": "Github",
     "linkedin": "Linkedin",
-    "footer": "Mualliflik huquqi ©2025 Temurbek Reyimberdiyev",
+    "footer": "Mualliflik huquqi ©2026 Temurbek Reyimberdiyev",
     "sendMessage": "Xabar yuborish",
     "contactInfo": "Ma'lumotlar",
     "socials": "Ijtimoiy tarmoqlar",
@@ -77,6 +78,11 @@
     "email": "Elektron pochta",
     "phone": "Telefon",
     "message": "Xabaringiz",
-    "submit": "Yuborish"
+    "submit": "Yuborish",
+    "messageSent": "Xabar muvaffaqiyatli yuborildi!",
+    "messageError": "Xabar yuborilmadi, qayta urinib ko‘ring.",
+    "success": "Muvaffaqiyat!",
+    "error": "Xatolik!",
+    "close": "Yopish"
   }
 }

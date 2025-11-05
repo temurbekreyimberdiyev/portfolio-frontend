@@ -43,6 +43,7 @@
   "experience": {
     "title": "EXPERIENCE",
      "at": "at",
+     "present": "Present",
     "period": {
       "google": "Nov 2019 – Present",
       "apple": "Jan 2016 – Dec 2017",
@@ -70,7 +71,7 @@
     "instagram": "Instagram",
     "github": "Github",
     "linkedin": "Linkedin",
-    "footer": "Copyright ©2025 Temurbek Reyimberdiyev",
+    "footer": "Copyright ©2026 Temurbek Reyimberdiyev",
     "sendMessage": "Send Message",
     "contactInfo": "Info",
     "socials": "Socials",
@@ -78,6 +79,11 @@
     "email": "Email",
     "phone": "Phone",
     "message": "Message",
-    "submit": "Submit"
+    "submit": "Submit",
+    "messageSent": "Message sent successfully!",
+    "messageError": "Message could not be sent. Please try again.",
+    "success": "Success!",
+    "error": "Error!",
+    "close": "Close"
   }
 }
