@@ -1,32 +1,26 @@
-import { FaReact } from "react-icons/fa";
-import { SiNextdotjs, SiTypescript } from "react-icons/si";
-import { TbCube } from "react-icons/tb";
 import { FiExternalLink } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
-// 🔹 Default Unsplash random image (agar backenddan image kelmasa)
+// Default Unsplash random image (agar backenddan image kelmasa)
 const getDefaultImage = () =>
   `https://source.unsplash.com/800x600/?project,technology,web,code,developer`;
 
-// 🔹 Linkni to‘liq URL qiluvchi funksiya
+// Linkni to‘liq URL qiluvchi funksiya
 const getFullLink = (link) => {
   if (!link) return "#";
 
-  // Agar link "http" yoki "https" bilan boshlansa, uni o'zgartirmaymiz
   if (link.startsWith("http://") || link.startsWith("https://")) {
     return link;
   }
 
-  // Agar link "www." bilan boshlansa, https:// qo'shamiz
   if (link.startsWith("www.")) {
     return `https://${link}`;
   }
 
-  // Aks holda sizning default domainni qo'shamiz
   return `https://example.com${link.startsWith("/") ? "" : "/"}${link}`;
 };
 
-export default function ProjectCard({ image, title, description, tech = [], link }) {
+export default function ProjectCard({ image, title, description, skills = [], link }) {
   const { t } = useTranslation();
 
   return (
@@ -80,13 +74,35 @@ export default function ProjectCard({ image, title, description, tech = [], link
           </p>
         </div>
 
-        {/* Tech icons + link */}
+        {/* Tech icons (backenddan kelgan ikonlar) + link */}
         <div className="flex items-center justify-between mt-auto">
-          <div className="flex gap-3 text-lg sm:text-xl text-gray-600 dark:text-gray-300">
-            {tech.includes("react") && <FaReact className="text-cyan-400" />}
-            {tech.includes("next") && <SiNextdotjs className="text-gray-900 dark:text-white" />}
-            {tech.includes("ts") && <SiTypescript className="text-blue-400" />}
-            {tech.includes("three") && <TbCube className="text-purple-400" />}
+          <div className="flex flex-wrap gap-2">
+            {skills.length > 0 ? (
+              skills.map((skill) => (
+                <div
+                  key={skill.id}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-white/20 dark:bg-white/10 rounded-full text-xs font-medium border border-white/30 dark:border-white/70 backdrop-blur-sm"
+                  title={skill.name}
+                >
+                  {skill.icon ? (
+                    <img
+                      src={skill.icon}
+                      alt={skill.name}
+                      className="w-5 h-5 object-contain"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextElementSibling.style.display = "block";
+                      }}
+                    />
+                  ) : null}
+                  <span className={skill.icon ? "" : "hidden"}>{skill.name}</span>
+                  {!skill.icon && <span>{skill.name}</span>}
+                </div>
+              ))
+            ) : (
+              <span className="text-gray-500 text-xs">{t("projects.no_tech") || "No tech stack"}</span>
+            )}
           </div>
 
           <a

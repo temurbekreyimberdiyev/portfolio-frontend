@@ -19,6 +19,10 @@ export default function SkillsManagement() {
   const [preview, setPreview] = useState(null);
   const API_URL = "http://127.0.0.1:8000/api/skills/";
 
+  // O'CHIRISH TASDIQLASH MODALI UCHUN
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [skillToDelete, setSkillToDelete] = useState(null);
+
   // Fetch skills from backend
   const fetchSkills = async () => {
     try {
@@ -39,12 +43,23 @@ export default function SkillsManagement() {
     fetchSkills();
   }, []);
 
-  const handleDelete = async (id) => {
+  // --- DELETE WITH CONFIRM ---
+  const handleDelete = (id) => {
+    setSkillToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!skillToDelete) return;
+
     try {
-      await axios.delete(`${API_URL}${id}/`);
-      setSkills((prev) => prev.filter((s) => s.id !== id));
+      await axios.delete(`${API_URL}${skillToDelete}/`);
+      setSkills((prev) => prev.filter((s) => s.id !== skillToDelete));
+      setDeleteConfirmOpen(false);
+      setSkillToDelete(null);
     } catch (err) {
       console.error("Failed to delete skill:", err);
+      alert("O‘chirishda xato yuz berdi!");
     }
   };
 
@@ -88,6 +103,12 @@ export default function SkillsManagement() {
     setIsDialogOpen(true);
   };
 
+  const openAddDialog = () => {
+    setEditingSkill(null);
+    setPreview(null);
+    setIsDialogOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -101,11 +122,7 @@ export default function SkillsManagement() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button
-              onClick={() => {
-                setEditingSkill(null);
-                setPreview(null);
-                setIsDialogOpen(true);
-              }}
+              onClick={openAddDialog}
               className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -180,6 +197,38 @@ export default function SkillsManagement() {
         </Dialog>
       </div>
 
+      {/* DELETE CONFIRMATION MODAL */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Haqiqatan o‘chirmoqchimisiz?</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-white/70">
+              Bu mahorat butunlay o‘chib ketadi va loyihalardan ham yo‘qoladi.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteConfirmOpen(false);
+                setSkillToDelete(null);
+              }}
+              className="border-white/20 hover:bg-white/10"
+            >
+              Bekor qilish
+            </Button>
+            <Button
+              onClick={confirmDelete}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              Ha, o‘chirish
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Skills Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {skills.map((skill) => (
@@ -211,7 +260,7 @@ export default function SkillsManagement() {
                     className="w-8 h-8 object-contain rounded-md"
                   />
                 ) : (
-                  <span className="text-2xl">⚙️</span>
+                  <span className="text-2xl">Gear</span>
                 )}
               </div>
               <span className="text-sm break-words">{skill.name}</span>

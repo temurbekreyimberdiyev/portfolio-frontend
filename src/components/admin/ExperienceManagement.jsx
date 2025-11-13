@@ -11,29 +11,31 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
-import axios from "axios";
+import API from "../../api/axios";
 
 export default function ExperienceManagement() {
   const [experiences, setExperiences] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [formLang, setFormLang] = useState("uz");
   const [viewLang, setViewLang] = useState("uz");
 
   const [company, setCompany] = useState({ uz: "", en: "", ru: "" });
   const [role, setRole] = useState({ uz: "", en: "", ru: "" });
   const [description, setDescription] = useState({ uz: "", en: "", ru: "" });
-  const [logo, setLogo] = useState(null);
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [current, setCurrent] = useState(false);
 
-  const API_URL = "http://127.0.0.1:8000/api/experiences/";
+  // O'CHIRISH TASDIQLASH MODALI UCHUN
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [expToDelete, setExpToDelete] = useState(null);
 
-  // Fetch experiences from backend
+  // --- FETCH EXPERIENCES ---
   const fetchExperiences = async () => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await API.get("experiences/");
       setExperiences(
         res.data.map((exp) => ({
           id: exp.id,
@@ -77,71 +79,92 @@ export default function ExperienceManagement() {
     setCompany({ uz: "", en: "", ru: "" });
     setRole({ uz: "", en: "", ru: "" });
     setDescription({ uz: "", en: "", ru: "" });
-    setLogo(null);
+    setLogoFile(null);
+    setLogoPreview(null);
     setStartDate("");
     setEndDate("");
     setCurrent(false);
-    setFormLang("uz");
   };
 
+  // --- EDIT ---
   const handleEdit = (exp) => {
     setEditingId(exp.id);
     setCompany(exp.company);
     setRole(exp.role);
     setDescription(exp.description);
-    setLogo(exp.logo);
-    setStartDate(exp.startDate);
-    setEndDate(exp.endDate);
+    setLogoPreview(exp.logo);
+    setLogoFile(null);
+    setStartDate(exp.startDate ? exp.startDate.slice(0, 7) : "");
+    setEndDate(exp.endDate ? exp.endDate.slice(0, 7) : "");
     setCurrent(exp.current);
-    setFormLang("uz");
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id) => {
+  // --- DELETE WITH CONFIRM ---
+  const handleDelete = (id) => {
+    setExpToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!expToDelete) return;
+
     try {
-      await axios.delete(`${API_URL}${id}/`);
-      setExperiences((prev) => prev.filter((e) => e.id !== id));
+      await API.delete(`experiences/${expToDelete}/`);
+      setExperiences((prev) => prev.filter((e) => e.id !== expToDelete));
+      setDeleteConfirmOpen(false);
+      setExpToDelete(null);
     } catch (err) {
-      console.error("Failed to delete experience:", err);
+      console.error("O‘chirishda xato:", err);
+      alert("O‘chirishda xato yuz berdi!");
     }
   };
 
+  // --- LOGO UPLOAD ---
   const handleLogoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setLogoFile(file);
     const reader = new FileReader();
-    reader.onloadend = () => setLogo(reader.result);
+    reader.onloadend = () => setLogoPreview(reader.result);
     reader.readAsDataURL(file);
   };
 
+  // --- SAVE ---
   const handleSave = async (e) => {
     e.preventDefault();
-    const payload = new FormData();
-    payload.append("company_uz", company.uz);
-    payload.append("company_en", company.en);
-    payload.append("company_ru", company.ru);
-    payload.append("role_uz", role.uz);
-    payload.append("role_en", role.en);
-    payload.append("role_ru", role.ru);
-    payload.append("description_uz", description.uz);
-    payload.append("description_en", description.en);
-    payload.append("description_ru", description.ru);
-    payload.append("start_date", startDate);
-    payload.append("end_date", current ? "" : endDate);
-    payload.append("current", current);
-    if (logo && logo instanceof File) payload.append("logo", logo);
+    const formData = new FormData();
+
+    formData.append("company_uz", company.uz);
+    formData.append("company_en", company.en);
+    formData.append("company_ru", company.ru);
+    formData.append("role_uz", role.uz);
+    formData.append("role_en", role.en);
+    formData.append("role_ru", role.ru);
+    formData.append("description_uz", description.uz);
+    formData.append("description_en", description.en);
+    formData.append("description_ru", description.ru);
+
+    formData.append("start_date", startDate ? `${startDate}-01` : "");
+    formData.append("end_date", current ? "" : (endDate ? `${endDate}-01` : ""));
+    formData.append("current", current);
+
+    if (logoFile) {
+      formData.append("logo", logoFile);
+    }
 
     try {
       if (editingId) {
-        await axios.put(`${API_URL}${editingId}/`, payload);
+        await API.put(`experiences/${editingId}/`, formData);
       } else {
-        await axios.post(API_URL, payload);
+        await API.post("experiences/", formData);
       }
       fetchExperiences();
       setIsDialogOpen(false);
       clearForm();
     } catch (err) {
-      console.error("Failed to save experience:", err);
+      console.error("Saqlashda xato:", err.response?.data || err);
+      alert("Xato: " + JSON.stringify(err.response?.data || err.message));
     }
   };
 
@@ -188,75 +211,120 @@ export default function ExperienceManagement() {
               </Button>
             </DialogTrigger>
 
-            {/* RESPONSIVE DIALOG */}
-            <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-lg sm:max-w-2xl w-[90vw] max-h-[90vh] overflow-y-auto rounded-xl">
+            <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-lg sm:max-w-2xl w-[90vw] max-h-[90vh] overflow-y-auto rounded-xl p-6">
               <DialogHeader>
-                <DialogTitle>
+                <DialogTitle className="text-xl">
                   {editingId ? "Edit Experience" : "Add New Experience"}
                 </DialogTitle>
               </DialogHeader>
 
-              <div className="flex flex-wrap gap-2 mb-4">
-                {["uz", "en", "ru"].map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() => setFormLang(lang)}
-                    className={`px-3 py-1.5 rounded-md text-sm ${
-                      formLang === lang
-                        ? "bg-gradient-to-r from-purple-500 to-blue-500"
-                        : "bg-white/10 hover:bg-white/20"
-                    }`}
-                  >
-                    {lang.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-
-              <form onSubmit={handleSave} className="space-y-4">
-                <div>
-                  <Label>Company Name ({formLang.toUpperCase()})</Label>
-                  <Input
-                    value={company[formLang]}
-                    onChange={(e) =>
-                      setCompany({ ...company, [formLang]: e.target.value })
-                    }
-                    className="bg-white/5 border-white/10"
-                    required
-                  />
+              <form onSubmit={handleSave} className="space-y-6 mt-4">
+                {/* UZBEK */}
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+                  <h4 className="text-sm font-semibold text-purple-400">O'zbekcha (UZ)</h4>
+                  <div>
+                    <Label>Kompaniya nomi (UZ)</Label>
+                    <Input
+                      value={company.uz}
+                      onChange={(e) => setCompany({ ...company, uz: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Lavozim (UZ)</Label>
+                    <Input
+                      value={role.uz}
+                      onChange={(e) => setRole({ ...role, uz: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Tavsif (UZ)</Label>
+                    <Textarea
+                      rows={3}
+                      value={description.uz}
+                      onChange={(e) => setDescription({ ...description, uz: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <Label>Role / Position ({formLang.toUpperCase()})</Label>
-                  <Input
-                    value={role[formLang]}
-                    onChange={(e) =>
-                      setRole({ ...role, [formLang]: e.target.value })
-                    }
-                    className="bg-white/5 border-white/10"
-                    required
-                  />
+                {/* ENGLISH */}
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+                  <h4 className="text-sm font-semibold text-blue-400">English (EN)</h4>
+                  <div>
+                    <Label>Company Name (EN)</Label>
+                    <Input
+                      value={company.en}
+                      onChange={(e) => setCompany({ ...company, en: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Position (EN)</Label>
+                    <Input
+                      value={role.en}
+                      onChange={(e) => setRole({ ...role, en: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Description (EN)</Label>
+                    <Textarea
+                      rows={3}
+                      value={description.en}
+                      onChange={(e) => setDescription({ ...description, en: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <Label>Description ({formLang.toUpperCase()})</Label>
-                  <Textarea
-                    rows={3}
-                    value={description[formLang]}
-                    onChange={(e) =>
-                      setDescription({ ...description, [formLang]: e.target.value })
-                    }
-                    className="bg-white/5 border-white/10"
-                    required
-                  />
+                {/* RUSSIAN */}
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+                  <h4 className="text-sm font-semibold text-green-400">Русский (RU)</h4>
+                  <div>
+                    <Label>Название компании (RU)</Label>
+                    <Input
+                      value={company.ru}
+                      onChange={(e) => setCompany({ ...company, ru: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Должность (RU)</Label>
+                    <Input
+                      value={role.ru}
+                      onChange={(e) => setRole({ ...role, ru: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Описание (RU)</Label>
+                    <Textarea
+                      rows={3}
+                      value={description.ru}
+                      onChange={(e) => setDescription({ ...description, ru: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
                 </div>
 
                 {/* Logo Upload */}
                 <div>
                   <Label>Company Logo</Label>
                   <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    {logo ? (
+                    {logoPreview ? (
                       <img
-                        src={logo}
+                        src={logoPreview}
                         alt="logo"
                         className="w-16 h-16 object-contain rounded-md bg-white/5 p-1 border border-white/10"
                       />
@@ -279,6 +347,7 @@ export default function ExperienceManagement() {
                   </div>
                 </div>
 
+                {/* Dates */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label>Start Date</Label>
@@ -307,18 +376,19 @@ export default function ExperienceManagement() {
                     type="checkbox"
                     checked={current}
                     onChange={(e) => setCurrent(e.target.checked)}
-                    className="w-4 h-4"
+                    className="w-4 h-4 rounded border-white/30"
                   />
-                  <Label className="cursor-pointer text-sm sm:text-base">
-                    Currently working here
-                  </Label>
+                  <Label className="cursor-pointer">Currently working here</Label>
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setIsDialogOpen(false)}
+                    onClick={() => {
+                      setIsDialogOpen(false);
+                      clearForm();
+                    }}
                     className="border-white/10 w-full sm:w-auto"
                   >
                     Cancel
@@ -335,6 +405,38 @@ export default function ExperienceManagement() {
           </Dialog>
         </div>
       </div>
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Haqiqatan o‘chirmoqchimisiz?</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-white/70">
+              Bu tajriba butunlay o‘chib ketadi va qayta tiklab bo‘lmaydi.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteConfirmOpen(false);
+                setExpToDelete(null);
+              }}
+              className="border-white/20 hover:bg-white/10"
+            >
+              Bekor qilish
+            </Button>
+            <Button
+              onClick={confirmDelete}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              Ha, o‘chirish
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Timeline */}
       <div className="relative mt-6">
@@ -393,10 +495,12 @@ export default function ExperienceManagement() {
                   -{" "}
                   {exp.current
                     ? "Present"
-                    : new Date(exp.endDate).toLocaleDateString("en-US", {
+                    : exp.endDate
+                    ? new Date(exp.endDate).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "short",
-                      })}
+                      })
+                    : "Present"}
                 </p>
               </div>
             </div>

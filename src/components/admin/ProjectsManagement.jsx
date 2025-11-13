@@ -11,20 +11,33 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
-import API from "../../api/axios"; // Axios konfiguratsiyangiz
-
-const mockSkills = ["React", "Next.js", "Node.js", "MongoDB", "PostgreSQL", "TailwindCSS", "Docker"];
+import API from "../../api/axios";
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
+  const [skills, setSkills] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [selectedTech, setSelectedTech] = useState([]);
   const [language, setLanguage] = useState("uz");
-  const [formLanguage, setFormLanguage] = useState("uz");
   const [title, setTitle] = useState({ uz: "", en: "", ru: "" });
   const [description, setDescription] = useState({ uz: "", en: "", ru: "" });
+  const [imageFile, setImageFile] = useState(null);
+
+  // O'CHIRISH TASDIQLASH MODALI UCHUN
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+
+  // --- FETCH SKILLS FROM BACKEND ---
+  const fetchSkills = async () => {
+    try {
+      const res = await API.get("skills/");
+      setSkills(res.data);
+    } catch (err) {
+      console.error("Skills yuklashda xato:", err);
+    }
+  };
 
   // --- FETCH PROJECTS FROM BACKEND ---
   const fetchProjects = async () => {
@@ -34,7 +47,7 @@ export default function Projects() {
         id: p.id,
         title: { uz: p.title_uz, en: p.title_en, ru: p.title_ru },
         description: { uz: p.description_uz, en: p.description_en, ru: p.description_ru },
-        techStack: p.skills.map((s) => s.name),
+        techStack: p.skills.map((s) => ({ id: s.id, name: s.name, icon: s.icon })),
         link: p.link,
         image: p.image,
       }));
@@ -45,66 +58,130 @@ export default function Projects() {
   };
 
   useEffect(() => {
+    fetchSkills();
     fetchProjects();
   }, []);
 
-  // --- DELETE PROJECT ---
-  const handleDelete = async (id) => {
+  // --- DELETE PROJECT WITH CONFIRM ---
+  const handleDelete = (id) => {
+    setProjectToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!projectToDelete) return;
+
     try {
-      await API.delete(`projects/${id}/`);
-      setProjects(projects.filter((p) => p.id !== id));
+      await API.delete(`projects/${projectToDelete}/`);
+      setProjects(projects.filter((p) => p.id !== projectToDelete));
+      setDeleteConfirmOpen(false);
+      setProjectToDelete(null);
     } catch (err) {
-      console.error(err);
+      console.error("O‘chirishda xato:", err);
+      alert("O‘chirishda xato yuz berdi!");
     }
   };
 
   // --- EDIT PROJECT ---
   const handleEdit = (project) => {
     setEditingProject(project);
-    setSelectedTech(project.techStack || []);
+    setSelectedTech(project.techStack.map((s) => s.id));
     setPreviewImage(project.image || null);
+    setImageFile(null);
     setTitle(project.title || { uz: "", en: "", ru: "" });
     setDescription(project.description || { uz: "", en: "", ru: "" });
-    setFormLanguage("uz");
     setIsDialogOpen(true);
   };
 
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setPreviewImage(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleTechToggle = (tech) => {
+  const handleTechToggle = (skillId) => {
     setSelectedTech((prev) =>
-      prev.includes(tech) ? prev.filter((t) => t !== tech) : [...prev, tech]
+      prev.includes(skillId) ? prev.filter((id) => id !== skillId) : [...prev, skillId]
     );
   };
 
   // --- SAVE PROJECT (CREATE OR UPDATE) ---
   const handleSave = async (e) => {
     e.preventDefault();
-    const payload = {
-      title_uz: title.uz,
-      title_en: title.en,
-      title_ru: title.ru,
-      description_uz: description.uz,
-      description_en: description.en,
-      description_ru: description.ru,
-      link: e.currentTarget.link.value,
-      skills: selectedTech,
-      image: previewImage,
-    };
+    let res;
 
     try {
-      let res;
       if (editingProject) {
-        res = await API.put(`projects/${editingProject.id}/`, payload);
+        if (imageFile) {
+          const formData = new FormData();
+          formData.append("title_uz", title.uz);
+          formData.append("title_en", title.en);
+          formData.append("title_ru", title.ru);
+          formData.append("description_uz", description.uz);
+          formData.append("description_en", description.en);
+          formData.append("description_ru", description.ru);
+          formData.append("link", e.currentTarget.link.value);
+
+          selectedTech.forEach((id) => {
+            formData.append("skills_ids", id);
+          });
+
+          formData.append("image", imageFile);
+
+          res = await API.put(`projects/${editingProject.id}/`, formData);
+        } else {
+          const payload = {
+            title_uz: title.uz,
+            title_en: title.en,
+            title_ru: title.ru,
+            description_uz: description.uz,
+            description_en: description.en,
+            description_ru: description.ru,
+            link: e.currentTarget.link.value,
+            skills_ids: selectedTech,
+          };
+          res = await API.put(`projects/${editingProject.id}/`, payload, {
+            headers: { "Content-Type": "application/json" },
+          });
+        }
       } else {
-        res = await API.post("projects/", payload);
+        // YANGI PROJECT
+        if (imageFile) {
+          const formData = new FormData();
+          formData.append("title_uz", title.uz);
+          formData.append("title_en", title.en);
+          formData.append("title_ru", title.ru);
+          formData.append("description_uz", description.uz);
+          formData.append("description_en", description.en);
+          formData.append("description_ru", description.ru);
+          formData.append("link", e.currentTarget.link.value);
+
+          selectedTech.forEach((id) => {
+            formData.append("skills_ids", id);
+          });
+
+          formData.append("image", imageFile);
+
+          res = await API.post("projects/", formData);
+        } else {
+          const payload = {
+            title_uz: title.uz,
+            title_en: title.en,
+            title_ru: title.ru,
+            description_uz: description.uz,
+            description_en: description.en,
+            description_ru: description.ru,
+            link: e.currentTarget.link.value,
+            skills_ids: selectedTech,
+          };
+          res = await API.post("projects/", payload, {
+            headers: { "Content-Type": "application/json" },
+          });
+        }
       }
 
       const savedProject = {
@@ -115,7 +192,11 @@ export default function Projects() {
           en: res.data.description_en,
           ru: res.data.description_ru,
         },
-        techStack: res.data.skills.map((s) => s.name),
+        techStack: res.data.skills.map((s) => ({
+          id: s.id,
+          name: s.name,
+          icon: s.icon,
+        })),
         link: res.data.link,
         image: res.data.image,
       };
@@ -130,10 +211,12 @@ export default function Projects() {
       setEditingProject(null);
       setSelectedTech([]);
       setPreviewImage(null);
+      setImageFile(null);
       setTitle({ uz: "", en: "", ru: "" });
       setDescription({ uz: "", en: "", ru: "" });
     } catch (err) {
-      console.error(err);
+      console.error("Saqlashda xato:", err.response?.data);
+      alert("XATO: " + JSON.stringify(err.response?.data || err.message));
     }
   };
 
@@ -147,24 +230,6 @@ export default function Projects() {
             language === lang
               ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
               : "text-white/60 hover:text-white"
-          }`}
-        >
-          {lang.toUpperCase()}
-        </button>
-      ))}
-    </div>
-  );
-
-  const FormLanguageSwitcher = () => (
-    <div className="flex items-center justify-end gap-2 mb-3">
-      {["uz", "en", "ru"].map((lang) => (
-        <button
-          key={lang}
-          onClick={() => setFormLanguage(lang)}
-          className={`px-3 py-1 rounded-lg border transition-all ${
-            formLanguage === lang
-              ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
-              : "border-white/10 text-white/60 hover:text-white"
           }`}
         >
           {lang.toUpperCase()}
@@ -193,9 +258,9 @@ export default function Projects() {
                   setEditingProject(null);
                   setSelectedTech([]);
                   setPreviewImage(null);
+                  setImageFile(null);
                   setTitle({ uz: "", en: "", ru: "" });
                   setDescription({ uz: "", en: "", ru: "" });
-                  setFormLanguage("uz");
                 }}
                 className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 w-full sm:w-auto"
               >
@@ -211,42 +276,83 @@ export default function Projects() {
                 </DialogTitle>
               </DialogHeader>
 
-              <FormLanguageSwitcher />
-
-              <form onSubmit={handleSave} className="space-y-4">
-                <div>
-                  <Label htmlFor={`title_${formLanguage}`}>
-                    Title ({formLanguage.toUpperCase()})
-                  </Label>
-                  <Input
-                    id={`title_${formLanguage}`}
-                    value={title[formLanguage]}
-                    onChange={(e) =>
-                      setTitle({ ...title, [formLanguage]: e.target.value })
-                    }
-                    className="bg-white/5 border-white/10"
-                    required
-                  />
+              <form onSubmit={handleSave} className="space-y-6 mt-4">
+                {/* UZBEK */}
+                <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-white/10">
+                  <h4 className="text-sm font-semibold text-purple-400">O'zbekcha (UZ)</h4>
+                  <div>
+                    <Label htmlFor="title_uz">Sarlavha (UZ)</Label>
+                    <Input
+                      id="title_uz"
+                      value={title.uz}
+                      onChange={(e) => setTitle({ ...title, uz: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="desc_uz">Tavsif (UZ)</Label>
+                    <Textarea
+                      id="desc_uz"
+                      rows={3}
+                      value={description.uz}
+                      onChange={(e) => setDescription({ ...description, uz: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <Label htmlFor={`desc_${formLanguage}`}>
-                    Description ({formLanguage.toUpperCase()})
-                  </Label>
-                  <Textarea
-                    id={`desc_${formLanguage}`}
-                    rows={3}
-                    value={description[formLanguage]}
-                    onChange={(e) =>
-                      setDescription({
-                        ...description,
-                        [formLanguage]: e.target.value,
-                      })
-                    }
-                    className="bg-white/5 border-white/10"
-                  />
+                {/* ENGLISH */}
+                <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-white/10">
+                  <h4 className="text-sm font-semibold text-blue-400">English (EN)</h4>
+                  <div>
+                    <Label htmlFor="title_en">Title (EN)</Label>
+                    <Input
+                      id="title_en"
+                      value={title.en}
+                      onChange={(e) => setTitle({ ...title, en: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="desc_en">Description (EN)</Label>
+                    <Textarea
+                      id="desc_en"
+                      rows={3}
+                      value={description.en}
+                      onChange={(e) => setDescription({ ...description, en: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                    />
+                  </div>
                 </div>
 
+                {/* RUSSIAN */}
+                <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-white/10">
+                  <h4 className="text-sm font-semibold text-green-400">Русский (RU)</h4>
+                  <div>
+                    <Label htmlFor="title_ru">Заголовок (RU)</Label>
+                    <Input
+                      id="title_ru"
+                      value={title.ru}
+                      onChange={(e) => setTitle({ ...title, ru: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="desc_ru">Описание (RU)</Label>
+                    <Textarea
+                      id="desc_ru"
+                      rows={3}
+                      value={description.ru}
+                      onChange={(e) => setDescription({ ...description, ru: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                    />
+                  </div>
+                </div>
+
+                {/* Image Upload */}
                 <div>
                   <Label>Project Image</Label>
                   <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -276,43 +382,55 @@ export default function Projects() {
                   </div>
                 </div>
 
+                {/* Tech Stack */}
                 <div>
                   <Label>Tech Stack</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
-                    {mockSkills.map((tech) => (
-                      <label
-                        key={tech}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${
-                          selectedTech.includes(tech)
-                            ? "bg-purple-500/20 border-purple-500 text-purple-300"
-                            : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedTech.includes(tech)}
-                          onChange={() => handleTechToggle(tech)}
-                          className="hidden"
-                        />
-                        {tech}
-                      </label>
-                    ))}
-                  </div>
+                  {skills.length === 0 ? (
+                    <p className="text-white/40 text-sm mt-2">Skills yuklanmoqda...</p>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+                      {skills.map((skill) => (
+                        <label
+                          key={skill.id}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all ${
+                            selectedTech.includes(skill.id)
+                              ? "bg-purple-500/20 border-purple-500 text-purple-300"
+                              : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedTech.includes(skill.id)}
+                            onChange={() => handleTechToggle(skill.id)}
+                            className="hidden"
+                          />
+                          {skill.icon ? (
+                            <img src={skill.icon} alt={skill.name} className="w-6 h-6 object-contain" />
+                          ) : (
+                            <div className="w-6 h-6 bg-white/10 rounded" />
+                          )}
+                          <span className="text-sm font-medium">{skill.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
+                {/* Project Link */}
                 <div>
                   <Label htmlFor="link">Project Link</Label>
                   <Input
                     id="link"
                     name="link"
                     type="url"
-                    defaultValue={editingProject?.link}
+                    defaultValue={editingProject?.link || ""}
                     placeholder="https://example.com"
                     className="bg-white/5 border-white/10"
                     required
                   />
                 </div>
 
+                {/* Buttons */}
                 <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
                   <Button
                     type="button"
@@ -320,6 +438,11 @@ export default function Projects() {
                     onClick={() => {
                       setIsDialogOpen(false);
                       setEditingProject(null);
+                      setTitle({ uz: "", en: "", ru: "" });
+                      setDescription({ uz: "", en: "", ru: "" });
+                      setPreviewImage(null);
+                      setImageFile(null);
+                      setSelectedTech([]);
                     }}
                     className="border-white/10 w-full sm:w-auto"
                   >
@@ -337,6 +460,38 @@ export default function Projects() {
           </Dialog>
         </div>
       </div>
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="bg-[#0a0a1a] border-white/10 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Haqiqatan o‘chirmoqchimisiz?</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-white/70">
+              Bu loyiha butunlay o‘chib ketadi va qayta tiklab bo‘lmaydi.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteConfirmOpen(false);
+                setProjectToDelete(null);
+              }}
+              className="border-white/20 hover:bg-white/10"
+            >
+              Bekor qilish
+            </Button>
+            <Button
+              onClick={confirmDelete}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              Ha, o‘chirish
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -376,12 +531,15 @@ export default function Projects() {
             </p>
 
             <div className="flex flex-wrap gap-2 mb-4">
-              {project.techStack.map((tech, idx) => (
+              {project.techStack.map((skill) => (
                 <span
-                  key={idx}
-                  className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs sm:text-sm"
+                  key={skill.id}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs sm:text-sm"
                 >
-                  {tech}
+                  {skill.icon && (
+                    <img src={skill.icon} alt={skill.name} className="w-4 h-4 object-contain" />
+                  )}
+                  {skill.name}
                 </span>
               ))}
             </div>

@@ -11,7 +11,7 @@ export default function Projects() {
 
   const lang = i18n.language || "uz";
 
-  // 🔹 Backenddan loyihalarni olish
+  // Backenddan loyihalarni olish
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/projects/")
@@ -23,7 +23,7 @@ export default function Projects() {
       });
   }, []);
 
-  // 🔹 Sahifalash logikasi
+  // Sahifalash logikasi
   const indexOfLastProject = currentPage * projectsPerPage;
   const indexOfFirstProject = indexOfLastProject - projectsPerPage;
   const currentProjects = projects.slice(indexOfFirstProject, indexOfLastProject);
@@ -32,7 +32,6 @@ export default function Projects() {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
 
-    // Projects bo‘limiga smooth scroll
     const projectsSection = document.getElementById("projects-section");
     if (projectsSection) {
       projectsSection.scrollIntoView({ behavior: "smooth" });
@@ -71,7 +70,8 @@ export default function Projects() {
                 }
                 title={project[`title_${lang}`]}
                 description={project[`description_${lang}`]}
-                tech={project.skills.map((skill) => skill.name)}
+                // YANGI: Endi to'liq skill ob'ektlari (name + icon) uzatilmoqda
+                skills={project.skills} // Bu yerda icon ham bor!
                 link={project.link}
               />
             ))}

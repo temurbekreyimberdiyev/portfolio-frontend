@@ -31,16 +31,12 @@ const MESSAGE_API = `${API_BASE}/messages/`;
 
 export default function ContactManagement() {
   const [contactInfo, setContactInfo] = useState({
-    uz: { phone: "", email: "", address: "" },
-    en: { phone: "", email: "", address: "" },
-    ru: { phone: "", email: "", address: "" },
+    phone: "",
+    email: "",
+    address: { uz: "", en: "", ru: "" },
   });
-  const [contactId, setContactId] = useState(null); // Yangi: bitta yozuv ID
-  const [socialLinks, setSocialLinks] = useState({
-    uz: [],
-    en: [],
-    ru: [],
-  });
+  const [contactId, setContactId] = useState(null);
+  const [socialLinks, setSocialLinks] = useState([]);
   const [messages, setMessages] = useState([]);
   const [currentLang, setCurrentLang] = useState("uz");
 
@@ -58,28 +54,20 @@ export default function ContactManagement() {
       try {
         setLoading(true);
 
-        // === Fetch Contacts (bitta yozuv) ===
+        // === Fetch Contact (bitta yozuv) ===
         const contactRes = await fetch(CONTACT_API);
         const contacts = await contactRes.json();
-        const contact = contacts.find((c) => c.lang === "uz") || contacts[0];
+        const contact = contacts[0];
 
         if (contact) {
           setContactId(contact.id);
           setContactInfo({
-            uz: {
-              phone: contact.phone || "",
-              email: contact.email || "",
-              address: contact.address_uz || "",
-            },
-            en: {
-              phone: contact.phone || "",
-              email: contact.email || "",
-              address: contact.address_en || "",
-            },
-            ru: {
-              phone: contact.phone || "",
-              email: contact.email || "",
-              address: contact.address_ru || "",
+            phone: contact.phone || "",
+            email: contact.email || "",
+            address: {
+              uz: contact.address_uz || "",
+              en: contact.address_en || "",
+              ru: contact.address_ru || "",
             },
           });
         }
@@ -87,28 +75,14 @@ export default function ContactManagement() {
         // === Fetch Social Links ===
         const socialRes = await fetch(SOCIAL_API);
         const socials = await socialRes.json();
-        const newSocialLinks = { uz: [], en: [], ru: [] };
-        socials.forEach((s) => {
-          newSocialLinks.uz.push({
+        setSocialLinks(
+          socials.map((s) => ({
             id: s.id.toString(),
-            platform: s.platform_uz,
+            platform: { uz: s.platform_uz, en: s.platform_en, ru: s.platform_ru },
             url: s.url,
             iconUrl: s.icon,
-          });
-          newSocialLinks.en.push({
-            id: s.id.toString(),
-            platform: s.platform_en,
-            url: s.url,
-            iconUrl: s.icon,
-          });
-          newSocialLinks.ru.push({
-            id: s.id.toString(),
-            platform: s.platform_ru,
-            url: s.url,
-            iconUrl: s.icon,
-          });
-        });
-        setSocialLinks(newSocialLinks);
+          }))
+        );
 
         // === Fetch Messages ===
         const msgRes = await fetch(MESSAGE_API);
@@ -162,23 +136,19 @@ export default function ContactManagement() {
     }
   };
 
-  // Tuzatilgan: bitta yozuv, payload faqat kerakli maydon
-  const handleUpdateContact = async (field, value) => {
-    const updated = {
-      ...contactInfo,
-      [currentLang]: { ...contactInfo[currentLang], [field]: value },
-    };
-    setContactInfo(updated);
-
-    if (!contactId) return;
-
-    const payload = {};
+  const handleUpdateContact = async (field, value, lang = null) => {
+    let payload = {};
 
     if (field === "phone" || field === "email") {
+      setContactInfo((prev) => ({ ...prev, [field]: value }));
       payload[field] = value;
     } else if (field === "address") {
-      payload[`address_${currentLang}`] = value;
+      const updatedAddress = { ...contactInfo.address, [lang]: value };
+      setContactInfo((prev) => ({ ...prev, address: updatedAddress }));
+      payload[`address_${lang}`] = value;
     }
+
+    if (!contactId) return;
 
     try {
       await fetch(`${CONTACT_API}${contactId}/`, {
@@ -212,12 +182,7 @@ export default function ContactManagement() {
   const handleDeleteSocial = async (id) => {
     try {
       await fetch(`${SOCIAL_API}${id}/`, { method: "DELETE" });
-      setSocialLinks((prev) => ({
-        ...prev,
-        uz: prev.uz.filter((s) => s.id !== id),
-        en: prev.en.filter((s) => s.id !== id),
-        ru: prev.ru.filter((s) => s.id !== id),
-      }));
+      setSocialLinks((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
       console.error("Failed to delete social link:", err);
     }
@@ -242,7 +207,7 @@ export default function ContactManagement() {
             Manage your contact info, links & messages
           </p>
         </div>
-        <Tabs defaultValue={currentLang} onValueChange={handleLangSwitch}>
+        <Tabs value={currentLang} onValueChange={handleLangSwitch}>
           <TabsList className="bg-white/5 border border-white/10 flex-wrap justify-center">
             <TabsTrigger value="uz">UZ</TabsTrigger>
             <TabsTrigger value="en">EN</TabsTrigger>
@@ -268,24 +233,58 @@ export default function ContactManagement() {
         <TabsContent value="info" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Panel */}
-            <div className="rounded-2xl p-6 bg-white/5 border border-white/10 space-y-4">
-              {["phone", "email", "address"].map((field, idx) => (
-                <div key={idx}>
-                  <Label className="capitalize">{field}</Label>
-                  <div className="flex items-center gap-3 mt-2">
-                    {field === "phone" && <Phone className="w-5 h-5 text-white/40" />}
-                    {field === "email" && <Mail className="w-5 h-5 text-white/40" />}
-                    {field === "address" && <MapPin className="w-5 h-5 text-white/40" />}
-                    <Input
-                      value={contactInfo[currentLang][field] || ""}
-                      onChange={(e) => handleUpdateContact(field, e.target.value)}
-                      className="bg-white/5 border-white/10 flex-1"
-                    />
-                  </div>
+            <div className="rounded-2xl p-6 bg-white/5 border border-white/10 space-y-6">
+              {/* Phone & Email (bitta) */}
+              <div>
+                <Label>Phone</Label>
+                <div className="flex items-center gap-3 mt-2">
+                  <Phone className="w-5 h-5 text-white/40" />
+                  <Input
+                    value={contactInfo.phone}
+                    onChange={(e) => handleUpdateContact("phone", e.target.value)}
+                    className="bg-white/5 border-white/10 flex-1"
+                    placeholder="+998 99 123 45 67"
+                  />
                 </div>
-              ))}
+              </div>
+
+              <div>
+                <Label>Email</Label>
+                <div className="flex items-center gap-3 mt-2">
+                  <Mail className="w-5 h-5 text-white/40" />
+                  <Input
+                    value={contactInfo.email}
+                    onChange={(e) => handleUpdateContact("email", e.target.value)}
+                    className="bg-white/5 border-white/10 flex-1"
+                    placeholder="example@mail.com"
+                  />
+                </div>
+              </div>
+
+              {/* Address (3 tilda) */}
+              <div className="space-y-4 pt-4 border-t border-white/10">
+                <h4 className="text-sm font-semibold text-purple-400">Manzil (Address)</h4>
+                {["uz", "en", "ru"].map((lang) => (
+                  <div key={lang}>
+                    <Label className="text-xs text-white/60">
+                      {lang.toUpperCase()} —{" "}
+                      {lang === "uz" ? "Manzil" : lang === "en" ? "Address" : "Адрес"}
+                    </Label>
+                    <div className="flex items-center gap-3 mt-1">
+                      <MapPin className="w-5 h-5 text-white/40" />
+                      <Input
+                        value={contactInfo.address[lang]}
+                        onChange={(e) => handleUpdateContact("address", e.target.value, lang)}
+                        className="bg-white/5 border-white/10 flex-1"
+                        placeholder={lang === "uz" ? "Toshkent, Uzbekistan" : lang === "en" ? "Tashkent, Uzbekistan" : "Ташкент, Узбекистан"}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               <Button className="w-full bg-gradient-to-r from-purple-500 to-blue-500" disabled>
-                Saved Automatically
+                Avtomatik saqlanadi
               </Button>
             </div>
 
@@ -296,13 +295,13 @@ export default function ContactManagement() {
               </h3>
               <div className="space-y-4 text-center lg:text-left">
                 <div className="flex items-center justify-center lg:justify-start gap-3 text-white/80">
-                  <Phone className="w-5 h-5" /> {contactInfo[currentLang].phone || "—"}
+                  <Phone className="w-5 h-5" /> {contactInfo.phone || "—"}
                 </div>
                 <div className="flex items-center justify-center lg:justify-start gap-3 text-white/80">
-                  <Mail className="w-5 h-5" /> {contactInfo[currentLang].email || "—"}
+                  <Mail className="w-5 h-5" /> {contactInfo.email || "—"}
                 </div>
                 <div className="flex items-center justify-center lg:justify-start gap-3 text-white/80">
-                  <MapPin className="w-5 h-5" /> {contactInfo[currentLang].address || "—"}
+                  <MapPin className="w-5 h-5" /> {contactInfo.address[currentLang] || "—"}
                 </div>
               </div>
             </div>
@@ -313,105 +312,108 @@ export default function ContactManagement() {
         <TabsContent value="social" className="mt-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
             <p className="text-white/60 text-center sm:text-left">
-              Manage your social links ({currentLang.toUpperCase()})
+              Ijtimoiy tarmoqlar ({currentLang.toUpperCase()})
             </p>
+
+            {/* ADD DIALOG */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-purple-500 to-blue-500 w-full sm:w-auto">
-                  <Plus className="w-4 h-4 mr-2" /> Add Link
+                  <Plus className="w-4 h-4 mr-2" /> Qo‘shish
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-[#0a0a1a] border-white/10 text-white w-[95%] sm:max-w-md">
+              <DialogContent className="bg-[#0a0a1a] border-white/10 text-white w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl">
                 <DialogHeader>
-                  <DialogTitle>Add Social Link</DialogTitle>
+                  <DialogTitle>Yangi ijtimoiy tarmoq qo‘shish</DialogTitle>
                 </DialogHeader>
 
-                <Tabs defaultValue={currentLang} className="mt-3">
-                  <TabsList className="bg-white/5 border border-white/10 mb-4 flex-wrap justify-center">
-                    <TabsTrigger value="uz">UZ</TabsTrigger>
-                    <TabsTrigger value="en">EN</TabsTrigger>
-                    <TabsTrigger value="ru">RU</TabsTrigger>
-                  </TabsList>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    const file = formData.get("icon");
 
-                  {["uz", "en", "ru"].map((lang) => (
-                    <TabsContent key={lang} value={lang}>
-                      <form
-                        onSubmit={async (e) => {
-                          e.preventDefault();
-                          const formData = new FormData(e.currentTarget);
-                          const file = formData.get("icon");
+                    const payload = new FormData();
+                    payload.append("platform_uz", formData.get("platform_uz"));
+                    payload.append("platform_en", formData.get("platform_en"));
+                    payload.append("platform_ru", formData.get("platform_ru"));
+                    payload.append("url", formData.get("url"));
+                    if (file) payload.append("icon", file);
 
-                          const payload = new FormData();
-                          payload.append("platform_uz", lang === "uz" ? formData.get("platform") : "");
-                          payload.append("platform_en", lang === "en" ? formData.get("platform") : "");
-                          payload.append("platform_ru", lang === "ru" ? formData.get("platform") : "");
-                          payload.append("url", formData.get("url"));
-                          if (file) payload.append("icon", file);
+                    try {
+                      const res = await fetch(SOCIAL_API, {
+                        method: "POST",
+                        body: payload,
+                      });
+                      const newLink = await res.json();
 
-                          try {
-                            const res = await fetch(SOCIAL_API, {
-                              method: "POST",
-                              body: payload,
-                            });
-                            const newLink = await res.json();
+                      setSocialLinks((prev) => [
+                        ...prev,
+                        {
+                          id: newLink.id.toString(),
+                          platform: {
+                            uz: newLink.platform_uz,
+                            en: newLink.platform_en,
+                            ru: newLink.platform_ru,
+                          },
+                          url: newLink.url,
+                          iconUrl: newLink.icon,
+                        },
+                      ]);
+                      setIsDialogOpen(false);
+                      setPreview(null);
+                    } catch (err) {
+                      console.error("Xato:", err);
+                    }
+                  }}
+                  className="space-y-6 mt-4"
+                >
+                  {/* UZ */}
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <h4 className="text-sm font-semibold text-purple-400 mb-3">O‘zbekcha (UZ)</h4>
+                    <Input name="platform_uz" placeholder="Masalan: Telegram" required className="bg-white/5 border-white/10" />
+                  </div>
 
-                            const linkObj = {
-                              id: newLink.id.toString(),
-                              platform:
-                                lang === "uz"
-                                  ? newLink.platform_uz
-                                  : lang === "en"
-                                  ? newLink.platform_en
-                                  : newLink.platform_ru,
-                              url: newLink.url,
-                              iconUrl: newLink.icon,
-                            };
+                  {/* EN */}
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <h4 className="text-sm font-semibold text-blue-400 mb-3">English (EN)</h4>
+                    <Input name="platform_en" placeholder="e.g. Telegram" required className="bg-white/5 border-white/10" />
+                  </div>
 
-                            setSocialLinks((prev) => ({
-                              ...prev,
-                              [lang]: [...prev[lang], linkObj],
-                            }));
-                            setIsDialogOpen(false);
-                            setPreview(null);
-                          } catch (err) {
-                            console.error("Failed to add social link:", err);
-                          }
-                        }}
-                        className="space-y-4"
-                      >
-                        <div>
-                          <Label>Platform</Label>
-                          <Input name="platform" required className="bg-white/5 border-white/10 w-full" />
-                        </div>
-                        <div>
-                          <Label>URL</Label>
-                          <Input name="url" required type="url" className="bg-white/5 border-white/10 w-full" />
-                        </div>
-                        <div>
-                          <Label>Upload Icon</Label>
-                          <Input type="file" name="icon" onChange={handleFileChange} accept="image/*" className="bg-white/5 border-white/10 w-full" />
-                          {preview && <img src={preview} alt="Preview" className="mt-3 w-16 h-16 mx-auto sm:mx-0" />}
-                        </div>
-                        <div className="flex justify-end gap-2 flex-wrap">
-                          <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                            Cancel
-                          </Button>
-                          <Button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500">
-                            Add
-                          </Button>
-                        </div>
-                      </form>
-                    </TabsContent>
-                  ))}
-                </Tabs>
+                  {/* RU */}
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <h4 className="text-sm font-semibold text-green-400 mb-3">Русский (RU)</h4>
+                    <Input name="platform_ru" placeholder="Например: Telegram" required className="bg-white/5 border-white/10" />
+                  </div>
+
+                  <div>
+                    <Label>URL</Label>
+                    <Input name="url" type="url" required placeholder="https://t.me/username" className="bg-white/5 border-white/10" />
+                  </div>
+
+                  <div>
+                    <Label>Ikona yuklash</Label>
+                    <input type="file" name="icon" accept="image/*" onChange={handleFileChange} className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-white/10 file:text-white hover:file:bg-white/20" />
+                    {preview && <img src={preview} alt="Preview" className="mt-3 w-20 h-20 rounded-lg object-contain bg-white/5" />}
+                  </div>
+
+                  <div className="flex justify-end gap-3">
+                    <Button type="button" variant="outline" onClick={() => { setIsDialogOpen(false); setPreview(null); }}>
+                      Bekor qilish
+                    </Button>
+                    <Button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500">
+                      Qo‘shish
+                    </Button>
+                  </div>
+                </form>
               </DialogContent>
             </Dialog>
 
             {/* EDIT DIALOG */}
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-              <DialogContent className="bg-[#0a0a1a] border-white/10 text-white w-[95%] sm:max-w-md">
+              <DialogContent className="bg-[#0a0a1a] border-white/10 text-white w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl">
                 <DialogHeader>
-                  <DialogTitle>Edit Social Link</DialogTitle>
+                  <DialogTitle>Tahrirlash</DialogTitle>
                 </DialogHeader>
                 {editingLink && (
                   <form
@@ -421,88 +423,75 @@ export default function ContactManagement() {
                       const file = formData.get("icon");
 
                       const payload = new FormData();
-                      payload.append("platform_uz", currentLang === "uz" ? formData.get("platform") : editingLink.platform);
-                      payload.append("platform_en", currentLang === "en" ? formData.get("platform") : editingLink.platform);
-                      payload.append("platform_ru", currentLang === "ru" ? formData.get("platform") : editingLink.platform);
+                      payload.append("platform_uz", formData.get("platform_uz"));
+                      payload.append("platform_en", formData.get("platform_en"));
+                      payload.append("platform_ru", formData.get("platform_ru"));
                       payload.append("url", formData.get("url"));
                       if (file) payload.append("icon", file);
 
                       try {
-                        const res = await fetch(`${SOCIAL_API}${editingLink.id}/`, {
+                        await fetch(`${SOCIAL_API}${editingLink.id}/`, {
                           method: "PATCH",
                           body: payload,
                         });
-                        const updated = await res.json();
 
-                        const updatedLink = {
-                          ...editingLink,
-                          platform:
-                            currentLang === "uz"
-                              ? updated.platform_uz
-                              : currentLang === "en"
-                              ? updated.platform_en
-                              : updated.platform_ru,
-                          url: updated.url,
-                          iconUrl: file ? URL.createObjectURL(file) : updated.icon,
-                        };
-
-                        setSocialLinks((prev) => ({
-                          ...prev,
-                          [currentLang]: prev[currentLang].map((link) =>
-                            link.id === editingLink.id ? updatedLink : link
-                          ),
-                        }));
+                        setSocialLinks((prev) =>
+                          prev.map((link) =>
+                            link.id === editingLink.id
+                              ? {
+                                  ...link,
+                                  platform: {
+                                    uz: formData.get("platform_uz"),
+                                    en: formData.get("platform_en"),
+                                    ru: formData.get("platform_ru"),
+                                  },
+                                  url: formData.get("url"),
+                                  iconUrl: file ? URL.createObjectURL(file) : link.iconUrl,
+                                }
+                              : link
+                          )
+                        );
                         setIsEditDialogOpen(false);
                         setEditingLink(null);
                         setEditPreview(null);
                       } catch (err) {
-                        console.error("Failed to update link:", err);
+                        console.error("Xato:", err);
                       }
                     }}
-                    className="space-y-4"
+                    className="space-y-6 mt-4"
                   >
-                    <div>
-                      <Label>Platform</Label>
-                      <Input
-                        name="platform"
-                        defaultValue={editingLink.platform}
-                        required
-                        className="bg-white/5 border-white/10 w-full"
-                      />
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                      <h4 className="text-sm font-semibold text-purple-400 mb-3">O‘zbekcha</h4>
+                      <Input name="platform_uz" defaultValue={editingLink.platform.uz} required className="bg-white/5 border-white/10" />
                     </div>
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                      <h4 className="text-sm font-semibold text-blue-400 mb-3">English</h4>
+                      <Input name="platform_en" defaultValue={editingLink.platform.en} required className="bg-white/5 border-white/10" />
+                    </div>
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                      <h4 className="text-sm font-semibold text-green-400 mb-3">Русский</h4>
+                      <Input name="platform_ru" defaultValue={editingLink.platform.ru} required className="bg-white/5 border-white/10" />
+                    </div>
+
                     <div>
                       <Label>URL</Label>
-                      <Input
-                        name="url"
-                        type="url"
-                        defaultValue={editingLink.url}
-                        required
-                        className="bg-white/5 border-white/10 w-full"
-                      />
+                      <Input name="url" type="url" defaultValue={editingLink.url} required className="bg-white/5 border-white/10" />
                     </div>
+
                     <div>
-                      <Label>Change Icon</Label>
-                      <Input
-                        type="file"
-                        name="icon"
-                        onChange={handleEditFileChange}
-                        accept="image/*"
-                        className="bg-white/5 border-white/10 w-full"
-                      />
+                      <Label>Ikona o‘zgartirish</Label>
+                      <input type="file" name="icon" accept="image/*" onChange={handleEditFileChange} className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-white/10 file:text-white hover:file:bg-white/20" />
                       {(editPreview || editingLink.iconUrl) && (
-                        <img
-                          src={editPreview || editingLink.iconUrl}
-                          alt="Preview"
-                          className="mt-3 w-16 h-16 mx-auto sm:mx-0"
-                        />
+                        <img src={editPreview || editingLink.iconUrl} alt="Preview" className="mt-3 w-20 h-20 rounded-lg object-contain bg-white/5" />
                       )}
                     </div>
-                    <div className="flex justify-end gap-2 flex-wrap">
+
+                    <div className="flex justify-end gap-3">
                       <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                        Cancel
+                        Bekor qilish
                       </Button>
                       <Button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500">
-                        Save
+                        Saqlash
                       </Button>
                     </div>
                   </form>
@@ -511,13 +500,14 @@ export default function ContactManagement() {
             </Dialog>
           </div>
 
+          {/* Social Links Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {socialLinks[currentLang].map((link) => (
-              <div key={link.id} className="rounded-2xl p-6 bg-white/5 border border-white/10 flex flex-col min-w-0">
+            {socialLinks.map((link) => (
+              <div key={link.id} className="rounded-2xl p-6 bg-white/5 border border-white/10 flex flex-col">
                 <div className="flex items-start justify-between mb-3">
                   <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/10">
                     {link.iconUrl ? (
-                      <img src={link.iconUrl} alt={link.platform} className="w-6 h-6 object-contain" />
+                      <img src={link.iconUrl} alt={link.platform[currentLang]} className="w-6 h-6 object-contain" />
                     ) : (
                       <Globe className="w-5 h-5 text-white/60" />
                     )}
@@ -526,7 +516,7 @@ export default function ContactManagement() {
                     <button
                       onClick={() => {
                         setEditingLink(link);
-                        setEditPreview(link.iconUrl);
+                        setEditPreview(null);
                         setIsEditDialogOpen(true);
                       }}
                       className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400"
@@ -541,7 +531,7 @@ export default function ContactManagement() {
                     </button>
                   </div>
                 </div>
-                <h4 className="mb-1 truncate">{link.platform}</h4>
+                <h4 className="mb-1 truncate">{link.platform[currentLang]}</h4>
                 <p className="text-sm text-white/50 truncate">{link.url}</p>
               </div>
             ))}
@@ -582,7 +572,7 @@ export default function ContactManagement() {
                         className={msg.read ? "border-green-500 text-green-400" : "border-blue-500 text-blue-400"}
                       >
                         <CheckCircle2 className="w-4 h-4 mr-1" />
-                        {msg.read ? "Unread" : "Mark as Read"}
+                        {msg.read ? "O‘qilmagan" : "O‘qilgan"}
                       </Button>
                       <Button
                         onClick={() => deleteMessage(msg.id)}
@@ -591,7 +581,7 @@ export default function ContactManagement() {
                         className="border-red-500 text-red-400"
                       >
                         <Trash2 className="w-4 h-4 mr-1" />
-                        Delete
+                        O‘chirish
                       </Button>
                     </div>
                   </div>
@@ -600,7 +590,7 @@ export default function ContactManagement() {
             ))}
 
             {messages.length === 0 && (
-              <p className="text-center text-white/40 mt-6">No messages available.</p>
+              <p className="text-center text-white/40 mt-6">Xabarlar yo‘q.</p>
             )}
           </div>
         </TabsContent>
