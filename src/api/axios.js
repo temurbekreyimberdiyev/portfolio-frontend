@@ -1,26 +1,25 @@
 import axios from "axios";
 
-const API = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/",
-  // Content-Type ni bu yerda o‘chiramiz — FormData uchun kerak emas
+const API_URL = "https://api.temurbekreyimberdiev.uz/api/";
+
+const api = axios.create({
+  baseURL: API_URL,
 });
 
-// ENG MUHIM INTERCEPTOR — FormData uchun
-API.interceptors.request.use((config) => {
-  // Agar FormData yuborilsa — Content-Type ni o‘chir
-  if (config.data instanceof FormData) {
-    delete config.headers["Content-Type"];
-    // transformRequest ni buzmaslik uchun
-    config.transformRequest = [data => data];
+// Request interceptor — JWT token qo‘shish
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access"); // access token
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // Agar JWT token kerak bo‘lsa (keyinroq ishlatasiz)
-  // const token = localStorage.getItem("token");
-  // if (token) {
-  //   config.headers.Authorization = `Bearer ${token}`;
-  // }
+  // Agar FormData bo‘lsa Content-Type ni o‘chir
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+    config.transformRequest = [data => data];
+  }
 
   return config;
 });
 
-export default API;
+export default api;

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import api from "../services/api"; // axios instans
 import ProjectCard from "./ProjectCard";
 
 export default function Projects() {
@@ -8,19 +8,38 @@ export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const projectsPerPage = 4;
-
   const lang = i18n.language || "uz";
 
-  // Backenddan loyihalarni olish
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/projects/")
-      .then((res) => {
-        setProjects(res.data);
-      })
-      .catch((err) => {
-        console.error("Projects API xato:", err);
-      });
+    const fetchProjects = async () => {
+      try {
+        // 1️⃣ Login va token olish
+        const loginRes = await api.post("token/", {
+          username: "admin",
+          password: "temur.969.21.12",
+        });
+
+        localStorage.setItem("access", loginRes.data.access);
+        localStorage.setItem("refresh", loginRes.data.refresh);
+
+        // 2️⃣ Token bilan projects API chaqirish
+        const res = await api.get("projects/");
+
+        // Agar kerak bo‘lsa, icon URL larini to‘liq qilish
+        const data = res.data.map(project => {
+          if (project.image && !project.image.startsWith("http")) {
+            project.image = `${api.defaults.baseURL}${project.image}`;
+          }
+          return project;
+        });
+
+        setProjects(data);
+      } catch (err) {
+        console.error("Projects API yoki login xato:", err);
+      }
+    };
+
+    fetchProjects();
   }, []);
 
   // Sahifalash logikasi
@@ -41,37 +60,26 @@ export default function Projects() {
   return (
     <section
       id="projects-section"
-      name="projects"
       className="py-20 px-6 md:px-16 text-black dark:text-white transition-colors duration-500"
     >
-      {/* Title */}
-      <h2
-        className="text-center text-3xl font-bold mb-12 tracking-widest 
-        text-orange-500 dark:text-orange-400"
-      >
+      <h2 className="text-center text-3xl font-bold mb-12 tracking-widest text-orange-500 dark:text-orange-400">
         {t("projects.title")}
       </h2>
 
-      {/* Loading holati */}
       {projects.length === 0 ? (
         <p className="text-center text-gray-500 dark:text-gray-400">
           {t("projects.loading") || "Loading projects..."}
         </p>
       ) : (
         <>
-          {/* Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
             {currentProjects.map((project) => (
               <ProjectCard
                 key={project.id}
-                image={
-                  project.image ||
-                  "https://via.placeholder.com/400x300?text=No+Image"
-                }
+                image={project.image || "https://via.placeholder.com/400x300?text=No+Image"}
                 title={project[`title_${lang}`]}
                 description={project[`description_${lang}`]}
-                // YANGI: Endi to'liq skill ob'ektlari (name + icon) uzatilmoqda
-                skills={project.skills} // Bu yerda icon ham bor!
+                skills={project.skills} // skill ob'ektlarini uzatish (name + icon)
                 link={project.link}
               />
             ))}
@@ -83,12 +91,11 @@ export default function Projects() {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition
-                  ${
-                    currentPage === 1
-                      ? "opacity-50 cursor-not-allowed border-gray-400"
-                      : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
-                  }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
+                  currentPage === 1
+                    ? "opacity-50 cursor-not-allowed border-gray-400"
+                    : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
+                }`}
               >
                 {t("projects.prev") || "Prev"}
               </button>
@@ -97,12 +104,11 @@ export default function Projects() {
                 <button
                   key={index}
                   onClick={() => handlePageChange(index + 1)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium border transition
-                    ${
-                      currentPage === index + 1
-                        ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-400 dark:text-black"
-                        : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
-                    }`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
+                    currentPage === index + 1
+                      ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-400 dark:text-black"
+                      : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
+                  }`}
                 >
                   {index + 1}
                 </button>
@@ -111,12 +117,11 @@ export default function Projects() {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition
-                  ${
-                    currentPage === totalPages
-                      ? "opacity-50 cursor-not-allowed border-gray-400"
-                      : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
-                  }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
+                  currentPage === totalPages
+                    ? "opacity-50 cursor-not-allowed border-gray-400"
+                    : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
+                }`}
               >
                 {t("projects.next") || "Next"}
               </button>

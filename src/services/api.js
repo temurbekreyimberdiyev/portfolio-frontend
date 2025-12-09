@@ -1,50 +1,66 @@
 import axios from "axios";
 
-// 🔹 Backend manzili (localhost yoki production)
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api/";
+const API_URL = import.meta.env.VITE_API_URL || "https://api.temurbekreyimberdiev.uz/api/";
 
-
-// 🔹 Axios instans (asosiy sozlama)
+// Axios instans
 const api = axios.create({
   baseURL: API_URL,
+  // Content-Type ni o‘chirib yuborish FormData uchun keyinroq mumkin
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// 🔹 Request interceptor — JWT token qo‘shish
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access"); // access token
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  // Agar FormData yuborilsa
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+    config.transformRequest = [data => data];
+  }
+
+  return config;
+});
+
 // ----------------------------
-// 🔸 1. HERO SECTION
+// 🔸 API FUNKSIYALAR
 // ----------------------------
 export const getHero = () => api.get("hero/");
-
-// ----------------------------
-// 🔸 2. SKILLS
-// ----------------------------
 export const getSkills = () => api.get("skills/");
-
-// ----------------------------
-// 🔸 3. PROJECTS
-// ----------------------------
 export const getProjects = () => api.get("projects/");
-
-// ----------------------------
-// 🔸 4. EXPERIENCES
-// ----------------------------
 export const getExperiences = () => api.get("experiences/");
-
-// ----------------------------
-// 🔸 5. CONTACTS
-// ----------------------------
 export const getContacts = () => api.get("contacts/");
-
-// ----------------------------
-// 🔸 6. SOCIAL LINKS
-// ----------------------------
 export const getSocialLinks = () => api.get("social/");
+export const sendMessage = (data) => api.post("messages/", data);
 
 // ----------------------------
-// 🔸 7. MESSAGE yuborish (POST)
+// 🔹 AUTH FUNKSIYALAR
 // ----------------------------
-export const sendMessage = (data) => api.post("messages/", data);
+export const login = async (username, password) => {
+  const response = await api.post("token/", { username, password });
+  const { access, refresh } = response.data;
+  localStorage.setItem("access", access);
+  localStorage.setItem("refresh", refresh);
+  return response.data;
+};
+
+export const refreshToken = async () => {
+  const refresh = localStorage.getItem("refresh");
+  if (!refresh) return null;
+  const response = await api.post("token/refresh/", { refresh });
+  const { access } = response.data;
+  localStorage.setItem("access", access);
+  return access;
+};
+
+export const logout = () => {
+  localStorage.removeItem("access");
+  localStorage.removeItem("refresh");
+};
 
 export default api;
