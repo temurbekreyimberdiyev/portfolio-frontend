@@ -41,7 +41,7 @@ const Hero = () => {
   const lang = i18n.language || "uz";
 
   return (
-    <section id="home" className="min-h-screen flex flex-col items-center justify-center px-4 text-center text-black dark:text-white">
+    <section id="home" className="min-h-screen pt-28 flex flex-col items-center justify-center px-4 text-center text-black dark:text-white">
       {/* Avatar */}
       <div className="mb-8 p-[6px] rounded-full shadow-2xl bg-gradient-to-tr from-purple-400 via-pink-400 to-orange-300 animate-spin-slow">
         <div className="rounded-full p-1 bg-white/30 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-gray-700/50 shadow-inner">
