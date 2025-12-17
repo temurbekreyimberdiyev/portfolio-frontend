@@ -142,33 +142,33 @@
     "error": "Xatolik!",
     "close": "Yopish",
     "info": {
-      "phone": "+998 90 123 45 67",
-      "email": "temurbek@example.com",
+      "phone": "+998 95 969 21 12",
+      "email": "temurbekreyimberdiyev@gmail.com",
       "address": "Urganch, Xorazm, O‘zbekiston"
     },
     "social_items": [
       {
         "id": 1,
         "platform": "Telegram",
-        "url": "https://t.me/yourusername",
+        "url": "https://t.me/temurbek21",
         "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/2048px-Telegram_logo.svg.png"
       },
       {
         "id": 2,
         "platform": "Instagram",
-        "url": "https://instagram.com/yourusername",
+        "url": "https://www.instagram.com/temuurbek.21/",
         "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png"
       },
       {
         "id": 3,
         "platform": "Github",
-        "url": "https://github.com/yourusername",
+        "url": "https://github.com/TemurbekReyimberdiyev",
         "icon": "https://cdn-icons-png.flaticon.com/512/25/25231.png"
       },
       {
         "id": 4,
         "platform": "LinkedIn",
-        "url": "https://linkedin.com/in/yourusername",
+        "url": "https://www.linkedin.com/in/temurbek-reyimberdiyev-a773b6343/",
         "icon": "https://cdn-icons-png.flaticon.com/512/174/174857.png"
       }
     ]
