@@ -14,55 +14,111 @@
   },
   "skills": {
     "title": "Skills",
-    "description": "The skills, tools and technologies I am really good at:"
+    "description": "The skills, tools and technologies I am really good at:",
+    "items": [
+      {
+        "name": "JavaScript",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg"
+      },
+      {
+        "name": "React",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
+      },
+      {
+        "name": "Node.js",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg"
+      },
+      {
+        "name": "Python",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"
+      },
+      {
+        "name": "Tailwind",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg"
+      },
+      {
+        "name": "PostgreSQL",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg"
+      }
+    ]
   },
   "projects": {
     "title": "PROJECTS",
     "live": "Check Live Site",
     "prev": "Previous",
     "next": "Next",
-    "items": {
-      "earth": {
+    "loading": "Loading projects...",
+    "items": [
+      {
+        "id": 1,
         "title": "3D Solar System Planets to Explore",
-        "description": "Explore the wonders of our solar system with this captivating 3D simulation using Three.js."
+        "intro": "3D Solar System",
+        "description": "Explore the wonders of our solar system with this captivating 3D simulation using Three.js.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Solar_sys8.jpg",
+        "link": "https://github.com/",
+        "skills": [
+          {
+            "name": "Three.js",
+            "icon": "https://global.discourse-cdn.com/standard17/uploads/threejs/original/2X/e/e4f86d2200d2d35c30f7b1494e96b9595ebc2751.png"
+          },
+          {
+            "name": "React",
+            "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
+          }
+        ]
       },
-      "yoom": {
+      {
+        "id": 2,
         "title": "Yoom - Video Conferencing App",
-        "description": "Simplify your meetings with Yoom. Connect seamlessly with colleagues and friends."
-      },
-      "aiSaas": {
-        "title": "AI Image SaaS - Canva Application",
-        "description": "A real Software-as-a-Service app with AI features, payments and credit system using the latest stack."
-      },
-      "iphone": {
-        "title": "Animated Apple iPhone 3D Website",
-        "description": "Recreated the Apple iPhone 15 Pro website with GSAP animations and Three.js 3D effects."
+        "intro": "Video Conferencing",
+        "description": "Simplify your meetings with Yoom. Connect seamlessly with colleagues and friends.",
+        "image": "https://miro.medium.com/v2/resize:fit:1400/1*pE2fOVDikEUwiQJlh4ggzg.jpeg",
+        "link": "https://github.com/",
+        "skills": [
+          {
+            "name": "Next.js",
+            "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg"
+          },
+          {
+            "name": "TypeScript",
+            "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg"
+          }
+        ]
       }
-    }
+    ]
   },
   "experience": {
     "title": "EXPERIENCE",
-     "at": "at",
-     "present": "Present",
+    "at": "at",
+    "present": "Present",
     "period": {
       "google": "Nov 2019 – Present",
       "apple": "Jan 2016 – Dec 2017",
       "meta": "Jan 2017 – Oct 2019"
     },
-    "items": {
-      "google": {
+    "no_data": "No experience data found.",
+    "items": [
+      {
+        "id": 1,
+        "company": "Google",
         "role": "Lead Software Engineer",
-        "description": "At Google, I helped improve the accuracy and efficiency of core search algorithms used by millions of people."
+        "description": "At Google, I helped improve the accuracy and efficiency of core search algorithms used by millions of people.",
+        "start_date": "Nov 2019",
+        "end_date": "Present",
+        "current": true,
+        "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
       },
-      "apple": {
+      {
+        "id": 2,
+        "company": "Apple",
         "role": "Junior Software Engineer",
-        "description": "At Apple, I contributed to designing scalable software systems and led a cross-functional engineering team."
-      },
-      "meta": {
-        "role": "Software Engineer",
-        "description": "At Meta, I worked on backend architecture and large-scale data processing systems."
+        "description": "At Apple, I contributed to designing scalable software systems and led a cross-functional engineering team.",
+        "start_date": "Jan 2016",
+        "end_date": "Dec 2017",
+        "current": false,
+        "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg"
       }
-    }
+    ]
   },
   "contact": {
     "title": "Contact",
@@ -75,7 +131,7 @@
     "sendMessage": "Send Message",
     "contactInfo": "Info",
     "socials": "Socials",
-    "name" : "Name",
+    "name": "Name",
     "email": "Email",
     "phone": "Phone",
     "message": "Message",
@@ -84,6 +140,37 @@
     "messageError": "Message could not be sent. Please try again.",
     "success": "Success!",
     "error": "Error!",
-    "close": "Close"
+    "close": "Close",
+    "info": {
+      "phone": "+998 90 123 45 67",
+      "email": "temurbek@example.com",
+      "address": "Urgench, Khorezm, Uzbekistan"
+    },
+    "social_items": [
+      {
+        "id": 1,
+        "platform": "Telegram",
+        "url": "https://t.me/yourusername",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/2048px-Telegram_logo.svg.png"
+      },
+      {
+        "id": 2,
+        "platform": "Instagram",
+        "url": "https://instagram.com/yourusername",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png"
+      },
+      {
+        "id": 3,
+        "platform": "Github",
+        "url": "https://github.com/yourusername",
+        "icon": "https://cdn-icons-png.flaticon.com/512/25/25231.png"
+      },
+      {
+        "id": 4,
+        "platform": "LinkedIn",
+        "url": "https://linkedin.com/in/yourusername",
+        "icon": "https://cdn-icons-png.flaticon.com/512/174/174857.png"
+      }
+    ]
   }
 }

@@ -14,31 +14,78 @@
   },
   "skills": {
     "title": "Навыки",
-    "description": "Технологии, инструменты и языки, которыми я хорошо владею:"
+    "description": "Технологии, инструменты и языки, которыми я хорошо владею:",
+    "items": [
+      {
+        "name": "JavaScript",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg"
+      },
+      {
+        "name": "React",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
+      },
+      {
+        "name": "Node.js",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg"
+      },
+      {
+        "name": "Python",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"
+      },
+      {
+        "name": "Tailwind",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg"
+      },
+      {
+        "name": "PostgreSQL",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg"
+      }
+    ]
   },
   "projects": {
     "title": "ПРОЕКТЫ",
     "live": "Посмотреть сайт",
     "prev": "Предыдущая",
     "next": "Следующая",
-    "items": {
-      "earth": {
-        "title": "3D модель солнечной системы",
-        "description": "Исследуйте чудеса солнечной системы с помощью 3D-симуляции на Three.js."
+    "loading": "Загрузка проектов...",
+    "items": [
+      {
+        "id": 1,
+        "title": "3D Солнечная Система",
+        "intro": "3D Солнечная Система",
+        "description": "Исследуйте солнечную систему с помощью 3D симуляции (Three.js).",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Solar_sys8.jpg",
+        "link": "https://github.com/",
+        "skills": [
+          {
+            "name": "Three.js",
+            "icon": "https://global.discourse-cdn.com/standard17/uploads/threejs/original/2X/e/e4f86d2200d2d35c30f7b1494e96b9595ebc2751.png"
+          },
+          {
+            "name": "React",
+            "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
+          }
+        ]
       },
-      "yoom": {
-        "title": "Yoom — видеоконференции",
-        "description": "Общайтесь легко и удобно с помощью Yoom. Идеально для работы и друзей."
-      },
-      "aiSaas": {
-        "title": "AI Image SaaS — приложение Canva",
-        "description": "Настоящее SaaS-приложение с ИИ-функциями, оплатой и системой кредитов."
-      },
-      "iphone": {
-        "title": "3D сайт Apple iPhone",
-        "description": "Реконструкция сайта iPhone 15 Pro с анимациями GSAP и 3D-эффектами Three.js."
+      {
+        "id": 2,
+        "title": "Yoom - Видеоконференции",
+        "intro": "Видеоконференции",
+        "description": "Упростите свои встречи с Yoom. Легко общайтесь с коллегами.",
+        "image": "https://miro.medium.com/v2/resize:fit:1400/1*pE2fOVDikEUwiQJlh4ggzg.jpeg",
+        "link": "https://github.com/",
+        "skills": [
+          {
+            "name": "Next.js",
+            "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg"
+          },
+          {
+            "name": "TypeScript",
+            "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg"
+          }
+        ]
       }
-    }
+    ]
   },
   "experience": {
     "title": "ОПЫТ",
@@ -49,20 +96,29 @@
       "apple": "Январь 2016 – Декабрь 2017",
       "meta": "Январь 2017 – Октябрь 2019"
     },
-    "items": {
-      "google": {
-        "role": "Ведущий инженер-программист",
-        "description": "В Google я занимался улучшением алгоритмов поиска, работая над повышением точности и эффективности."
+    "no_data": "Опыт не найден.",
+    "items": [
+      {
+        "id": 1,
+        "company": "Google",
+        "role": "Ведущий Разработчик",
+        "description": "В Google я улучшал алгоритмы поиска для повышения точности и эффективности.",
+        "start_date": "Ноябрь 2019",
+        "end_date": "Настоящее время",
+        "current": true,
+        "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
       },
-      "apple": {
-        "role": "Младший инженер-программист",
-        "description": "В Apple занимался архитектурой программного обеспечения и проектированием масштабируемых систем."
-      },
-      "meta": {
-        "role": "Инженер-программист",
-        "description": "В Meta разрабатывал серверные системы и функции взаимодействия пользователей на платформе."
+      {
+        "id": 2,
+        "company": "Apple",
+        "role": "Младший Разработчик",
+        "description": "В Apple я работал над архитектурой программного обеспечения и масштабируемостью.",
+        "start_date": "Январь 2016",
+        "end_date": "Декабрь 2017",
+        "current": false,
+        "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg"
       }
-    }
+    ]
   },
   "contact": {
     "title": "Контакты",
@@ -75,7 +131,7 @@
     "sendMessage": "Отправить сообщение",
     "contactInfo": "Информация",
     "socials": "Социальные сети",
-    "name" : "Ваше имя",
+    "name": "Ваше имя",
     "email": "Ваш email",
     "phone": "Ваш телефон",
     "message": "Ваше сообщение",
@@ -84,6 +140,37 @@
     "messageError": "Не удалось отправить сообщение. Пожалуйста, попробуйте снова.",
     "success": "Успех!",
     "error": "Ошибка!",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "info": {
+      "phone": "+998 90 123 45 67",
+      "email": "temurbek@example.com",
+      "address": "Ургенч, Хорезм, Узбекистан"
+    },
+    "social_items": [
+      {
+        "id": 1,
+        "platform": "Telegram",
+        "url": "https://t.me/yourusername",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/2048px-Telegram_logo.svg.png"
+      },
+      {
+        "id": 2,
+        "platform": "Instagram",
+        "url": "https://instagram.com/yourusername",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png"
+      },
+      {
+        "id": 3,
+        "platform": "Github",
+        "url": "https://github.com/yourusername",
+        "icon": "https://cdn-icons-png.flaticon.com/512/25/25231.png"
+      },
+      {
+        "id": 4,
+        "platform": "LinkedIn",
+        "url": "https://linkedin.com/in/yourusername",
+        "icon": "https://cdn-icons-png.flaticon.com/512/174/174857.png"
+      }
+    ]
   }
 }

@@ -30,14 +30,23 @@ export default function Skills() {
           return skill;
         });
 
-        setSkills(data);
+        if (data.length > 0) {
+            setSkills(data);
+        } else {
+            // Fallback to static data
+             const staticSkills = t("skills.items", { returnObjects: true });
+             if (Array.isArray(staticSkills)) setSkills(staticSkills);
+        }
       } catch (err) {
         console.error("Skills API yoki login xato:", err);
+        // Fallback on error
+        const staticSkills = t("skills.items", { returnObjects: true });
+        if (Array.isArray(staticSkills)) setSkills(staticSkills);
       }
     };
 
     fetchSkills();
-  }, []);
+  }, [t]);
 
   return (
     <section className="relative overflow-hidden py-16 px-6 md:px-12 flex flex-col items-center rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] bg-white/20 dark:bg-[#0e0b1b]/25 backdrop-blur-2xl border border-white/30 dark:border-gray-700/40 text-black dark:text-white transition-all duration-700">

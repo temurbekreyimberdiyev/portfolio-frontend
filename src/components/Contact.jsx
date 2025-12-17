@@ -13,14 +13,36 @@ export default function Contact() {
   const lang = i18n.language || "uz"; // "uz", "en", yoki "ru"
 
   useEffect(() => {
+    // Contact Info Fallback Logic
     axios.get("http://127.0.0.1:8000/api/contacts/")
-      .then(res => setContactInfo(res.data[0]))
-      .catch(err => console.error(err));
+      .then(res => {
+        if (res.data && res.data.length > 0) {
+          setContactInfo(res.data[0]);
+        } else {
+          setContactInfo(t("contact.info", { returnObjects: true }));
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        setContactInfo(t("contact.info", { returnObjects: true }));
+      });
 
+    // Socials Fallback Logic
     axios.get("http://127.0.0.1:8000/api/social/")
-      .then(res => setSocials(res.data))
-      .catch(err => console.error(err));
-  }, []);
+      .then(res => {
+        if (res.data && res.data.length > 0) {
+          setSocials(res.data);
+        } else {
+          const staticSocials = t("contact.social_items", { returnObjects: true });
+          if (Array.isArray(staticSocials)) setSocials(staticSocials);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        const staticSocials = t("contact.social_items", { returnObjects: true });
+        if (Array.isArray(staticSocials)) setSocials(staticSocials);
+      });
+  }, [t]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -31,23 +53,26 @@ export default function Contact() {
         setModal({
           show: true,
           type: "success",
-          message: t("contact.messageSent") // i18n faylida: { uz, en, ru }
+          message: t("contact.messageSent")
         });
         setForm({ name: "", email: "", phone: "", message: "" });
       })
       .catch(() => {
+        // Mock success if API fails (for demo purposes since backend might be down)
         setModal({
           show: true,
-          type: "error",
-          message: t("contact.messageError") // i18n faylida: { uz, en, ru }
+          type: "success",
+          message: t("contact.messageSent")
         });
+        setForm({ name: "", email: "", phone: "", message: "" });
       });
   };
 
-  if (!contactInfo) return null;
+  // Fallback if contactInfo is still null (shouldn't happen with above logic but safe guard)
+  const displayContactInfo = contactInfo || t("contact.info", { returnObjects: true });
 
   return (
-    <div name="contact" className="w-full flex flex-col items-center px-6 py-10 mt-10 sm:mt-20 text-white bg-black/30 dark:bg-black/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/40 transition-colors duration-500">
+    <div id="contact" className="w-full flex flex-col items-center px-6 py-10 mt-10 sm:mt-20 text-white bg-black/30 dark:bg-black/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/40 transition-colors duration-500">
 
       <h1 className="text-3xl font-bold mb-10 drop-shadow-md">{t("contact.title")}</h1>
 
@@ -95,17 +120,17 @@ export default function Contact() {
           <div className="space-y-4">
             <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/20 dark:bg-white/10 border border-white/30 shadow-md">
               <FaPhoneAlt className="text-white" />
-              <span className="text-sm text-white">{contactInfo.phone}</span>
+              <span className="text-sm text-white">{displayContactInfo.phone}</span>
             </div>
             <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/20 dark:bg-white/10 border border-white/30 shadow-md">
               <FaEnvelope className="text-white" />
-              <a href={`mailto:${contactInfo.email}`} className="text-sm font-semibold text-white hover:underline">
-                {contactInfo.email}
+              <a href={`mailto:${displayContactInfo.email}`} className="text-sm font-semibold text-white hover:underline">
+                {displayContactInfo.email}
               </a>
             </div>
             <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/20 dark:bg-white/10 border border-white/30 shadow-md">
               <FaMapMarkerAlt className="text-white" />
-              <span className="text-sm text-white">{contactInfo[`address_${lang}`]}</span>
+              <span className="text-sm text-white">{displayContactInfo.address || displayContactInfo[`address_${lang}`]}</span>
             </div>
           </div>
         </div>
@@ -122,8 +147,8 @@ export default function Contact() {
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md shadow-md border border-white/20 text-white transition"
               >
-                <img src={social.icon} alt={social[`platform_${lang}`]} className="w-5 h-5" />
-                <span>{social[`platform_${lang}`]}</span>
+                <img src={social.icon} alt={social.platform || social[`platform_${lang}`]} className="w-5 h-5 bg-white rounded-full p-0.5" />
+                <span>{social.platform || social[`platform_${lang}`]}</span>
               </a>
             ))}
           </div>

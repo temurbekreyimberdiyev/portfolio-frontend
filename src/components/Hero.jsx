@@ -41,7 +41,7 @@ const Hero = () => {
   const lang = i18n.language || "uz";
 
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center px-4 text-center text-black dark:text-white">
+    <section id="home" className="min-h-screen flex flex-col items-center justify-center px-4 text-center text-black dark:text-white">
       {/* Avatar */}
       <div className="mb-8 p-[6px] rounded-full shadow-2xl bg-gradient-to-tr from-purple-400 via-pink-400 to-orange-300 animate-spin-slow">
         <div className="rounded-full p-1 bg-white/30 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-gray-700/50 shadow-inner">
@@ -67,7 +67,7 @@ const Hero = () => {
       </p>
 
       {/* Buttons */}
-      <div className="flex space-x-4 mt-8">
+      <div className="flex flex-wrap justify-center gap-4 mt-8">
         <Link to="contact" smooth={true} duration={500} offset={-80}>
           <button className="px-6 py-3 rounded-full font-semibold bg-gradient-to-r from-purple-500/40 to-pink-500/40 text-white border border-white/30 shadow-lg hover:from-purple-600/60 hover:to-pink-600/60 transition">
             {t("hero.btn_contact")}

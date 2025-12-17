@@ -14,30 +14,78 @@
   },
   "skills": {
     "title": "Ko‘nikmalar",
-    "description": "Men yaxshi biladigan texnologiyalar, vositalar va tillar:"
+    "description": "Men yaxshi biladigan texnologiyalar, vositalar va tillar:",
+    "items": [
+      {
+        "name": "JavaScript",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg"
+      },
+      {
+        "name": "React",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
+      },
+      {
+        "name": "Node.js",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg"
+      },
+      {
+        "name": "Python",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"
+      },
+      {
+        "name": "Tailwind",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg"
+      },
+      {
+        "name": "PostgreSQL",
+        "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg"
+      }
+    ]
   },
   "projects": {
     "title": "LOYIHALAR",
-    "live": "Saytni ko‘rish","prev": "Oldingi",
+    "live": "Saytni ko‘rish",
+    "prev": "Oldingi",
     "next": "Keyingi",
-    "items": {
-      "earth": {
-        "title": "3D Quyosh tizimi sayyoralarini o‘rganing",
-        "description": "Three.js yordamida Quyosh tizimidagi sayyoralarni 3D tarzda o‘rganing."
+    "loading": "Loyihalar yuklanmoqda...",
+    "items": [
+      {
+        "id": 1,
+        "title": "3D Quyosh tizimi",
+        "intro": "3D Quyosh Tizimi",
+        "description": "Quyosh tizimini ajoyib 3D simulyatsiya orqali o'rganing (Three.js).",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Solar_sys8.jpg",
+        "link": "https://github.com/",
+        "skills": [
+          {
+            "name": "Three.js",
+            "icon": "https://global.discourse-cdn.com/standard17/uploads/threejs/original/2X/e/e4f86d2200d2d35c30f7b1494e96b9595ebc2751.png"
+          },
+          {
+            "name": "React",
+            "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
+          }
+        ]
       },
-      "yoom": {
-        "title": "Yoom - Video qo‘ng‘iroq platformasi",
-        "description": "Yoom bilan uchrashuvlarni osonlashtiring. Hamkasblar va do‘stlar bilan bir zumda ulaning."
-      },
-      "aiSaas": {
-        "title": "AI Image SaaS - Canva ilovasi",
-        "description": "AI funksiyalari, to‘lov tizimi va kredit hisoblash imkoniyatiga ega haqiqiy SaaS ilovasi."
-      },
-      "iphone": {
-        "title": "3D iPhone animatsion veb-sayti",
-        "description": "GSAP va Three.js yordamida Apple iPhone 15 Pro saytining 3D versiyasi."
+      {
+        "id": 2,
+        "title": "Yoom - Video Konferensiya",
+        "intro": "Video Konferensiya",
+        "description": "Yoom bilan uchrashuvlarni osonlashtiring. Hamkasblar bilan oson bog'laning.",
+        "image": "https://miro.medium.com/v2/resize:fit:1400/1*pE2fOVDikEUwiQJlh4ggzg.jpeg",
+        "link": "https://github.com/",
+        "skills": [
+          {
+            "name": "Next.js",
+            "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg"
+          },
+          {
+            "name": "TypeScript",
+            "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg"
+          }
+        ]
       }
-    }
+    ]
   },
   "experience": {
     "title": "TAJRIBA",
@@ -48,20 +96,29 @@
       "apple": "Yanvar 2016 – Dekabr 2017",
       "meta": "Yanvar 2017 – Oktabr 2019"
     },
-    "items": {
-      "google": {
+    "no_data": "Tajriba topilmadi.",
+    "items": [
+      {
+        "id": 1,
+        "company": "Google",
         "role": "Yetakchi Dasturchi",
-        "description": "Google'da ishlagan davrimda, asosiy qidiruv algoritmlarini takomillashtirish ustida ishladim. Jamoa bilan hamkorlikda milliardlab foydalanuvchilar uchun aniqlik va samaradorlikni oshirishga hissa qo‘shdim."
+        "description": "Google'da qidiruv algoritmlarini yaxshiladim va samaradorlikni oshirdim.",
+        "start_date": "Noyabr 2019",
+        "end_date": "Hozirgacha",
+        "current": true,
+        "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
       },
-      "apple": {
+      {
+        "id": 2,
+        "company": "Apple",
         "role": "Kichik Dasturchi",
-        "description": "Apple kompaniyasida dasturiy ta'minot arxitekturasini ishlab chiqishda qatnashdim. Kengaytiriladigan tizimlar yaratish va jamoani boshqarish bo‘yicha mas’ul edim."
-      },
-      "meta": {
-        "role": "Dasturchi",
-        "description": "Meta'da backend tizimlar arxitekturasi va katta hajmdagi ma’lumotlarni qayta ishlash bilan shug‘ullandim."
+        "description": "Apple'da dasturiy ta'minot arxitekturasi ustida ishladim va jamoani boshqardim.",
+        "start_date": "Yanvar 2016",
+        "end_date": "Dekabr 2017",
+        "current": false,
+        "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg"
       }
-    }
+    ]
   },
   "contact": {
     "title": "Aloqa",
@@ -74,7 +131,7 @@
     "sendMessage": "Xabar yuborish",
     "contactInfo": "Ma'lumotlar",
     "socials": "Ijtimoiy tarmoqlar",
-    "name" : "Ismingiz",
+    "name": "Ismingiz",
     "email": "Elektron pochta",
     "phone": "Telefon",
     "message": "Xabaringiz",
@@ -83,6 +140,37 @@
     "messageError": "Xabar yuborilmadi, qayta urinib ko‘ring.",
     "success": "Muvaffaqiyat!",
     "error": "Xatolik!",
-    "close": "Yopish"
+    "close": "Yopish",
+    "info": {
+      "phone": "+998 90 123 45 67",
+      "email": "temurbek@example.com",
+      "address": "Urganch, Xorazm, O‘zbekiston"
+    },
+    "social_items": [
+      {
+        "id": 1,
+        "platform": "Telegram",
+        "url": "https://t.me/yourusername",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/2048px-Telegram_logo.svg.png"
+      },
+      {
+        "id": 2,
+        "platform": "Instagram",
+        "url": "https://instagram.com/yourusername",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png"
+      },
+      {
+        "id": 3,
+        "platform": "Github",
+        "url": "https://github.com/yourusername",
+        "icon": "https://cdn-icons-png.flaticon.com/512/25/25231.png"
+      },
+      {
+        "id": 4,
+        "platform": "LinkedIn",
+        "url": "https://linkedin.com/in/yourusername",
+        "icon": "https://cdn-icons-png.flaticon.com/512/174/174857.png"
+      }
+    ]
   }
 }

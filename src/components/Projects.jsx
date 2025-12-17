@@ -33,14 +33,21 @@ export default function Projects() {
           return project;
         });
 
-        setProjects(data);
+        if (data.length > 0) {
+          setProjects(data);
+        } else {
+          const staticProjects = t("projects.items", { returnObjects: true });
+          if (Array.isArray(staticProjects)) setProjects(staticProjects);
+        }
       } catch (err) {
         console.error("Projects API yoki login xato:", err);
+        const staticProjects = t("projects.items", { returnObjects: true });
+        if (Array.isArray(staticProjects)) setProjects(staticProjects);
       }
     };
 
     fetchProjects();
-  }, []);
+  }, [t]);
 
   // Sahifalash logikasi
   const indexOfLastProject = currentPage * projectsPerPage;
@@ -59,7 +66,7 @@ export default function Projects() {
 
   return (
     <section
-      id="projects-section"
+      id="projects"
       className="py-20 px-6 md:px-16 text-black dark:text-white transition-colors duration-500"
     >
       <h2 className="text-center text-3xl font-bold mb-12 tracking-widest text-orange-500 dark:text-orange-400">
@@ -77,8 +84,8 @@ export default function Projects() {
               <ProjectCard
                 key={project.id}
                 image={project.image || "https://via.placeholder.com/400x300?text=No+Image"}
-                title={project[`title_${lang}`]}
-                description={project[`description_${lang}`]}
+                title={project.title || project[`title_${lang}`]}
+                description={project.description || project[`description_${lang}`]}
                 skills={project.skills} // skill ob'ektlarini uzatish (name + icon)
                 link={project.link}
               />
@@ -91,11 +98,10 @@ export default function Projects() {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
-                  currentPage === 1
-                    ? "opacity-50 cursor-not-allowed border-gray-400"
-                    : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition ${currentPage === 1
+                  ? "opacity-50 cursor-not-allowed border-gray-400"
+                  : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
+                  }`}
               >
                 {t("projects.prev") || "Prev"}
               </button>
@@ -104,11 +110,10 @@ export default function Projects() {
                 <button
                   key={index}
                   onClick={() => handlePageChange(index + 1)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
-                    currentPage === index + 1
-                      ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-400 dark:text-black"
-                      : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
-                  }`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium border transition ${currentPage === index + 1
+                    ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-400 dark:text-black"
+                    : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
+                    }`}
                 >
                   {index + 1}
                 </button>
@@ -117,11 +122,10 @@ export default function Projects() {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
-                  currentPage === totalPages
-                    ? "opacity-50 cursor-not-allowed border-gray-400"
-                    : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition ${currentPage === totalPages
+                  ? "opacity-50 cursor-not-allowed border-gray-400"
+                  : "border-blue-600 text-blue-600 hover:text-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
+                  }`}
               >
                 {t("projects.next") || "Next"}
               </button>
