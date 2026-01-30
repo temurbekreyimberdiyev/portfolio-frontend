@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-scroll";
-import profil from "../assets/avatar.png"; // fallback image
+import profil from "../assets/avatar2.jpg"; // fallback image
 import axios from "axios";
 
 // 🔹 Production API va token
